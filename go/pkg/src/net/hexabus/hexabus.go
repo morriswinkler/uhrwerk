@@ -131,12 +131,12 @@ type HXB_InfoPacket struct {
      data []byte     // payload, size depending on datatype
 }
 
-type HXB_QueryPacket stuct {
+type HXB_QueryPacket struct {
      flags byte	      // flags 
      eid [3]byte      // endpoint id
 }
 
-type HXB_WritePacket stuct {
+type HXB_WritePacket struct {
      flags byte	      // flags 
      eid [3]byte      // endpoint id
      dtype byte	      // data type

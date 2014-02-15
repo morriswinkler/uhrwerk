@@ -109,8 +109,8 @@ const (
       HXB_ERR_INVALID_VALUE = 0x05
 )
 
-func addHeader(p *[]byte) {
-     &p[0], &p[1], p[2], p[3] = HXB_HEADER0, HXB_HEADER1, HXB_HEADER2, HXB_HEADER3
+func addHeader(p []byte) {
+     p[0], p[1], p[2], p[3] = HXB_HEADER0, HXB_HEADER1, HXB_HEADER2, HXB_HEADER3
 }
 
 type ErrorPacket struct {
@@ -120,7 +120,7 @@ type ErrorPacket struct {
 
 func (p *ErrorPacket) Encode(byte err) []byte {
      packet := make([]byte, 6)
-     addHeader(&packet)
+     addHeader(packet)
      return packet
 }
 

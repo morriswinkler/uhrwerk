@@ -107,6 +107,9 @@ const (
 
       // A value was encountered that cannot be interpreted
       HXB_ERR_INVALID_VALUE = 0x05
+      
+      // KERMIT polynominal for crc16
+      CRC16_KERMIT = 0x1021 
 )
 
 func addHeader(packet []byte) {
@@ -115,7 +118,7 @@ func addHeader(packet []byte) {
 
 type ErrorPacket struct {
      // 4 bytes header
-     Flags byte	      // 1 byte flags 
+     Flags byte	 // 1 byte flags 
      Error byte  // 1 byte error code
 }
 

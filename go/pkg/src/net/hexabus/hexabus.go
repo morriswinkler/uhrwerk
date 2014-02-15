@@ -110,7 +110,7 @@ const (
 )
 
 func addHeader(p *[]byte) {
-     p[0], p[1], p[2], p[3] = HXB_HEADER0, HXB_HEADER1, HXB_HEADER2, HXB_HEADER3
+     &p[0], &p[1], p[2], p[3] = HXB_HEADER0, HXB_HEADER1, HXB_HEADER2, HXB_HEADER3
 }
 
 type ErrorPacket struct {

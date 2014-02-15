@@ -114,13 +114,16 @@ func addHeader(packet []byte) {
 }
 
 type ErrorPacket struct {
-     Flags byte	      // flags 
-     Error byte  // error code
+     // 4 bytes header
+     Flags byte	      // 1 byte flags 
+     Error byte  // 1 byte error code
 }
 
-func (p *ErrorPacket) Encode(err int) []byte {
+func (p *ErrorPacket) Encode() []byte {
      packet := make([]byte, 6)
      addHeader(packet)
+     packet[4] = p.Flags
+     packet[5] = p.Error
      return packet
 }
 

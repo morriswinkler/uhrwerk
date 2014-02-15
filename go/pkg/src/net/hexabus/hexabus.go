@@ -6,7 +6,11 @@ const (
 
       // The UDP Data of a Hexabus Packet starts with the Bytes 0x48 0x58 0x30 0x43 
       // (HX0C) to identify it as a Hexabus Packet
-      HXB_HEADER = [0x48, 0x58, 0x30, 0x43]
+       
+      HXB_HEADER0 = 0x48
+      HXB_HEADER1 = 0x58
+      HXB_HEADER2 = 0x30
+      HXB_HEADER3 = 0x43
 
       /* Boolean values */      
 
@@ -105,42 +109,41 @@ const (
       HXB_ERR_INVALID_VALUE = 0x05
 )
 
-type HXB_ErrorPacket_ST stuct {
-     header [4]byte   // header "HX0C"
-     type byte	      // type 
-     flags byte	      // flags 
-     error_code byte  // error code
+func addHeader(p *[]byte) {
+     p[0], p[1], p[2], p[3] = HXB_HEADER0, HXB_HEADER1, HXB_HEADER2, HXB_HEADER3
 }
 
-func HXB_ErrorPacket(err byte) *HXB_ErrorPacket_ST {
-     return &HXB_ErrorPacket_ST{
-				header: [0x48, 0x58, 0x30, 0x43]
-				type: 0x00
-				flags: 0x00
-				error_code: err 
+type ErrorPacket struct {
+     Flags byte	      // flags 
+     Error byte  // error code
 }
 
-type HXB_InfoPacket stuct {
-     header byte[4]   // header "HX0C"
-     type byte	      // type 
+
+func (p *ErrorPacket) Encode(byte err) []byte {
+     packet := make([]byte, 6)
+     addHeader(&packet)
+     
+          
+}
+
+
+
+
+type HXB_InfoPacket struct {
      flags byte	      // flags 
-     eid byte[3]      // endpoint id
+     eid [3]byte     // endpoint id
      dtype byte	      // data type
-     data  byte[]     // payload, size depending on datatype
+     data  []byte     // payload, size depending on datatype
 }
 
 type HXB_QueryPacket stuct {
-     header byte[4]   // header "HX0C"
-     type byte	      // type 
      flags byte	      // flags 
-     eid byte[3]      // endpoint id
+     eid [3]byte      // endpoint id
 }
 
 type HXB_WritePacket stuct {
-     header byte[4]   // header "HX0C"
-     type byte	      // type 
      flags byte	      // flags 
-     eid byte[3]      // endpoint id
+     eid [3]byte      // endpoint id
      dtype byte	      // data type
-     data  byte[]     // payload, size depending on datatype
+     data  []byte     // payload, size depending on datatype
 }     

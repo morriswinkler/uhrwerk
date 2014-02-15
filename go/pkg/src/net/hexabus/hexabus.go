@@ -119,9 +119,10 @@ type ErrorPacket struct {
 }
 
 func (p *ErrorPacket) Encode(byte err) []byte {
+     err := 0
      packet := make([]byte, 6)
      addHeader(packet)
-     return packet
+     return packet, err
 }
 
 type HXB_InfoPacket struct {

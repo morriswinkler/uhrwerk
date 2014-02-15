@@ -118,11 +118,11 @@ type ErrorPacket struct {
      Error byte  // error code
 }
 
-func (p *ErrorPacket) Encode(byte err) []byte {
+func (p *ErrorPacket) Encode(byte, err) []byte {
      err := 0
      packet := make([]byte, 6)
      addHeader(packet)
-     return packet, err
+     return packet
 }
 
 type HXB_InfoPacket struct {

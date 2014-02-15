@@ -1,5 +1,7 @@
 package hexabus
 
+import "github.com/morriswinkler/crc16"
+
 // Constants
 const (
       /* Header */

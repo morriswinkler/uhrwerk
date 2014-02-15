@@ -118,22 +118,17 @@ type ErrorPacket struct {
      Error byte  // error code
 }
 
-
 func (p *ErrorPacket) Encode(byte err) []byte {
      packet := make([]byte, 6)
      addHeader(&packet)
-     
-          
+     return packet
 }
-
-
-
 
 type HXB_InfoPacket struct {
      flags byte	      // flags 
      eid [3]byte     // endpoint id
      dtype byte	      // data type
-     data  []byte     // payload, size depending on datatype
+     data []byte     // payload, size depending on datatype
 }
 
 type HXB_QueryPacket stuct {
@@ -145,5 +140,5 @@ type HXB_WritePacket stuct {
      flags byte	      // flags 
      eid [3]byte      // endpoint id
      dtype byte	      // data type
-     data  []byte     // payload, size depending on datatype
+     data []byte     // payload, size depending on datatype
 }     

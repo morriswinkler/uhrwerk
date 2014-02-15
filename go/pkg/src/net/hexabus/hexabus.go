@@ -118,7 +118,7 @@ type ErrorPacket struct {
      Error byte  // error code
 }
 
-func (p *ErrorPacket) Encode(byte, err) []byte {
+func (p *ErrorPacket) Encode(err byte) []byte {
      err := 0
      packet := make([]byte, 6)
      addHeader(packet)

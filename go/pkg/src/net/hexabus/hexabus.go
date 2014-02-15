@@ -118,6 +118,14 @@ func addHeader(packet []byte) {
      packet[0], packet[1], packet[2], packet[3] = HXB_HEADER0, HXB_HEADER1, HXB_HEADER2, HXB_HEADER3
 }
 
+func addCRC(packet []byte) {
+     crcTable := crc16.MakeTable(CRC16_KERMIT)
+     crc := crc16.Checksum(packet, crcTable)
+     packet_crc := make([]byte, (len(packet)+2))
+     copy(packet_crc, packet)
+     packet = packet_crc
+}
+
 type ErrorPacket struct {
      // 4 bytes header
      Flags byte	 // 1 byte flags 

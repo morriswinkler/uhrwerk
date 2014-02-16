@@ -123,6 +123,7 @@ func addCRC(packet []byte) {
      crc := crc16.Checksum(packet, crcTable)
      packet_crc := make([]byte, (len(packet)+2))
      copy(packet_crc, packet)
+     packet_crc[(len(packet)+1)]
      packet = packet_crc
 }
 

@@ -122,11 +122,19 @@ func addHeader(packet []byte) {
 func addCRC(packet []byte) []byte{
      crcTable := crc16.MakeTable(CRC16_KERMIT)
      crc := crc16.Checksum(packet, crcTable)
+     
      fmt.Println(crc)
+
      // convert crc unit16 into uint8 vars
      var crc1, crc2 uint8 = uint8(crc>>8), uint8(crc&0xff)
      packet = append(packet,crc1, crc2)
-     fmt.Println(packet)
+     return packet
+}
+
+func addData(packet []byte, data []byte) []byte {
+     for _, v := range data {
+     packet = append(packet, v)
+     }
      return packet
 }
 
@@ -137,20 +145,36 @@ type ErrorPacket struct {
 }
 
 func (p *ErrorPacket) Encode() []byte {
-     packet := make([]byte, 6, 8)
+     packet := make([]byte, 7)
      addHeader(packet)
-     packet[4] = p.Flags
-     packet[5] = p.Error
+     packet[4] = HXB_PTYPE_ERROR 
+     packet[5] = p.Flags
+     packet[6] = p.Error
      packet = addCRC(packet)
      return packet
 }
 
-type HXB_InfoPacket struct {
-     flags byte	      // flags 
-     eid [3]byte     // endpoint id
-     dtype byte	      // data type
-     data []byte     // payload, size depending on datatype
+type InfoPacket struct {
+     // 4 bytes header
+     Flags byte	  // 1 byteflags 
+     Eid uint32  // 4 bytes endpoint id
+     Dtype byte	  // 1 byte data type
+     Data []byte  // ... bytes payload, size depending on datatype
 }
+
+func (p *InfoPacket) Encode() []byte {
+     packet := make([]byte, 11)
+     addHeader(packet)
+     packet[4] = HXB_PTYPE_INFO
+     packet[5] = p.Flags
+     var eid0, eid1, eid2, eid3 uint8 = uint8(p.Eid>>24), uint8(p.Eid>>16), uint8(p.Eid>>8), uint8(p.Eid&0xff)
+     packet[6], packet[7], packet[8], packet[9] = eid0, eid1, eid2, eid3 
+     packet[10] = p.Dtype
+     packet = addData(packet, p.Data)
+     packet = addCRC(packet)     
+     return packet 
+}
+
 
 type HXB_QueryPacket struct {
      flags byte	      // flags 

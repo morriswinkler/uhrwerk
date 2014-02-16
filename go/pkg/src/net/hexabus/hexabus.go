@@ -119,7 +119,7 @@ func addHeader(packet []byte) {
      packet[0], packet[1], packet[2], packet[3] = HXB_HEADER0, HXB_HEADER1, HXB_HEADER2, HXB_HEADER3
 }
 
-func addCRC(packet []byte) {
+func addCRC(packet []byte) []byte{
      crcTable := crc16.MakeTable(CRC16_KERMIT)
      crc := crc16.Checksum(packet, crcTable)
      fmt.Println(crc)
@@ -127,6 +127,7 @@ func addCRC(packet []byte) {
      var crc1, crc2 uint8 = uint8(crc>>8), uint8(crc&0xff)
      packet = append(packet,crc1, crc2)
      fmt.Println(packet)
+     return packet
 }
 
 type ErrorPacket struct {
@@ -136,11 +137,11 @@ type ErrorPacket struct {
 }
 
 func (p *ErrorPacket) Encode() []byte {
-     packet := make([]byte, 6)
+     packet := make([]byte, 6, 8)
      addHeader(packet)
      packet[4] = p.Flags
      packet[5] = p.Error
-     addCRC(packet)
+     packet = addCRC(packet)
      return packet
 }
 

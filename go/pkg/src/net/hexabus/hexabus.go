@@ -1,6 +1,7 @@
 package hexabus
 
 import "github.com/morriswinkler/crc16"
+import "fmt"
 
 // Constants
 const (
@@ -112,8 +113,6 @@ const (
       
       // KERMIT polynominal for crc16
       CRC16_KERMIT = 0x1021 
-
-      TEST = 1
 )
 
 func addHeader(packet []byte) {
@@ -123,10 +122,11 @@ func addHeader(packet []byte) {
 func addCRC(packet []byte) {
      crcTable := crc16.MakeTable(CRC16_KERMIT)
      crc := crc16.Checksum(packet, crcTable)
-     packet_crc := make([]byte, (len(packet)+2))
-     copy(packet_crc, packet)
-     packet_crc[(len(packet)+1)] = byte(crc)
-     packet = packet_crc
+     fmt.Println(crc)
+     // convert crc unit16 into uint8 vars
+     var crc1, crc2 uint8 = uint8(crc>>8), uint8(crc&0xff)
+     packet = append(packet,crc1, crc2)
+     fmt.Println(packet)
 }
 
 type ErrorPacket struct {
@@ -140,6 +140,7 @@ func (p *ErrorPacket) Encode() []byte {
      addHeader(packet)
      packet[4] = p.Flags
      packet[5] = p.Error
+     addCRC(packet)
      return packet
 }
 

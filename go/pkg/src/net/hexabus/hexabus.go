@@ -112,6 +112,8 @@ const (
       
       // KERMIT polynominal for crc16
       CRC16_KERMIT = 0x1021 
+
+      TEST = 1
 )
 
 func addHeader(packet []byte) {

@@ -18,10 +18,10 @@ const (
       /* Boolean values */      
 
       // boolean false
-      HXB_FALSE = 0
+      HXB_FALSE = 0x00
       
       // boolean true
-      HXB_TRUE = 1
+      HXB_TRUE = 0x01
 
       /* Packet types */
       
@@ -123,7 +123,7 @@ func addCRC(packet []byte) []byte{
      crcTable := crc16.MakeTable(CRC16_KERMIT)
      crc := crc16.Checksum(packet, crcTable)
      
-     fmt.Println(crc)
+     fmt.Println("Checksum: ", crc)
 
      // convert crc unit16 into uint8 vars
      var crc1, crc2 uint8 = uint8(crc>>8), uint8(crc&0xff)
@@ -156,10 +156,11 @@ func (p *ErrorPacket) Encode() []byte {
 
 type InfoPacket struct {
      // 4 bytes header
+     // 1 byte packet type
      Flags byte	  // 1 byteflags 
      Eid uint32  // 4 bytes endpoint id
      Dtype byte	  // 1 byte data type
-     Data []byte  // ... bytes payload, size depending on datatype
+     Data []byte   // ... bytes payload, size depending on datatype
 }
 
 func (p *InfoPacket) Encode() []byte {
@@ -168,6 +169,7 @@ func (p *InfoPacket) Encode() []byte {
      packet[4] = HXB_PTYPE_INFO
      packet[5] = p.Flags
      var eid0, eid1, eid2, eid3 uint8 = uint8(p.Eid>>24), uint8(p.Eid>>16), uint8(p.Eid>>8), uint8(p.Eid&0xff)
+     fmt.Printf("EID bits: %b, %b, %b, %b\n", eid0, eid1, eid2, eid3)	    
      packet[6], packet[7], packet[8], packet[9] = eid0, eid1, eid2, eid3 
      packet[10] = p.Dtype
      packet = addData(packet, p.Data)

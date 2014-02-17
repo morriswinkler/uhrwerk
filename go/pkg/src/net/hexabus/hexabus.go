@@ -126,8 +126,7 @@ func addCRC(packet []byte) []byte{
      fmt.Println("Checksum: ", crc)
 
      // convert crc unit16 into uint8 vars
-     var crc1, crc2 uint8 = uint8(crc>>8), uint8(crc&0xff)
-     packet = append(packet,crc1, crc2)
+     packet = append(packet,uint8(crc>>8), uint8(crc&0xff))
      return packet
 }
 
@@ -168,9 +167,8 @@ func (p *InfoPacket) Encode() []byte {
      addHeader(packet)
      packet[4] = HXB_PTYPE_INFO
      packet[5] = p.Flags
-     var eid0, eid1, eid2, eid3 uint8 = uint8(p.Eid>>24), uint8(p.Eid>>16), uint8(p.Eid>>8), uint8(p.Eid&0xff)
-     fmt.Printf("EID bits: %b, %b, %b, %b\n", eid0, eid1, eid2, eid3)	    
-     packet[6], packet[7], packet[8], packet[9] = eid0, eid1, eid2, eid3 
+     packet[6], packet[7], packet[8], packet[9] = uint8(p.Eid>>24), uint8(p.Eid>>16), uint8(p.Eid>>8), uint8(p.Eid&0xff)
+     fmt.Printf("EID bits: %b, %b, %b, %b\n", packet[6], packet[7], packet[8], packet[9])	    
      packet[10] = p.Dtype
      packet = addData(packet, p.Data)
      packet = addCRC(packet)     

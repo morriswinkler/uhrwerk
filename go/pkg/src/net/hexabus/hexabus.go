@@ -3,8 +3,6 @@ package hexabus
 import "fmt"
 import "bytes"
 import "encoding/binary"
-import "github.com/morriswinkler/crc16"
-
 
 
 // Constants
@@ -116,9 +114,6 @@ const (
 
 	// A value was encountered that cannot be interpreted
 	HXB_ERR_INVALID_VALUE = 0x05
-	
-	// KERMIT polynominal for crc16
-	CRC16_KERMIT = 0x1021 
 )
 
 func addHeader(packet []byte) {
@@ -184,13 +179,30 @@ func addData(packet []byte, data interface{}) []byte {
 	
 }
 
-func addCRC(packet []byte) []byte{
-	crcTable := crc16.MakeTable(CRC16_KERMIT)
-	crc := crc16.Checksum(packet, crcTable)
-	
-	fmt.Println("Checksum: ", crc)
+// calculate crc16 kermit variant
+// this code was translated from a php snippet found on http://www.lammertbies.nl/forum/viewtopic.php?t=1253
+func crc16_KERMIT(packet []byte) uint16 {
+	var crc uint16
+        for _, v := range packet {
+                crc = crc ^ uint16(v)
+                for y := 0; y < 8; y++ {
+                        if (crc & 0x001) == 0x0001 {
+                                crc = (crc >> 1) ^ 0x8408
+                        } else {
+                                crc = crc >> 1
+                        }
+                }
+        }
+	// in the original Kermit implementation the two crc bytes are swaped, looks like boost::crc_optimal<16, 0x1021, 0x0000, 0, true, true> doesn't follow that ?
+        //lb := (crc & 0xff00) >> 8
+        //hb := (crc & 0x00ff) << 8
+        //crc = hb | lb
+	return crc
+} 
 
-	// convert crc unit16 into uint8 vars
+func addCRC(packet []byte) []byte {
+
+	crc := crc16_KERMIT(packet)
 	packet = append(packet,uint8(crc>>8), uint8(crc&0xff))
 	return packet
 }

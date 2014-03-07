@@ -141,7 +141,15 @@ func addData(packet []byte, data interface{}) []byte {
 		}
 		packet[10] = HXB_DTYPE_UINT32
 		packet = append(packet, buf.Bytes()...)
-	// TODO: HXB_DTYPE_DATETIME
+	// DateTime: holds HXB_DTYPE_DATETIME data ; needs testing
+	case DateTime:
+		buf := new(bytes.Buffer)
+		err := binary.Write(buf, binary.BigEndian, data)
+		if err != nil {
+			panic(fmt.Errorf("binary.Write failed:", err))
+		}
+		packet[10] = HXB_DTYPE_DATETIME
+		packet = append(packet, buf.Bytes()...)
 	case float32:
 		buf := new(bytes.Buffer)
 		err := binary.Write(buf, binary.BigEndian, data)
@@ -154,13 +162,22 @@ func addData(packet []byte, data interface{}) []byte {
 		if len(data) > HXB_STRING_PACKET_MAX_BUFFER_LENGTH { 
 			panic(fmt.Errorf("max string length 127 exeeded for string: %s", data))
 		} else {
-			// TODO: chech for 0 termination in string
+			// TODO: check if 0 termination in string is right that way
 			packet[10] = HXB_DTYPE_128STRING
 			packet = append(packet, data...)
 			packet = append(packet, byte(0))
 		}
-	// TODO: HXB_DTYPE_TIMESTAMP
+		// TIMESTAMP: intended for type syscall.Sysinfo_t.Uptime not working
+	case Timestamp:
+		buf := new(bytes.Buffer)
+		err := binary.Write(buf, binary.BigEndian, data)
+		if err != nil {
+			panic(fmt.Errorf("binary.Write failed:", err))
+		}
+		packet[10] = HXB_DTYPE_TIMESTAMP
+		packet = append(packet, buf.Bytes()...)
 	case []byte:
+		// TODO: check if padding is the intended behavior
 		if len(data) == 16 {
 			packet[10] = HXB_DTYPE_16BYTES
 			packet = append(packet, data...)
@@ -201,11 +218,42 @@ func crc16_KERMIT(packet []byte) uint16 {
 } 
 
 func addCRC(packet []byte) []byte {
-
 	crc := crc16_KERMIT(packet)
 	packet = append(packet,uint8(crc>>8), uint8(crc&0xff))
 	return packet
 }
+
+// struct to hold HXB_DTYPE_TIMESTAMP
+type Timestamp struct {
+	TotalSeconds uint32
+}
+
+func (t *Timestamp) Decode(data interface{}) {
+        buf := bytes.NewBuffer(data.([]byte))
+        err := binary.Read(buf, binary.BigEndian, t)
+        if err != nil {
+                panic(fmt.Errorf("binary.Write failed:", err))
+        }
+}
+
+// struct to hold HXB_DTYPE_DATETIME data
+type DateTime struct {
+        Hours uint8
+        Minutes uint8
+        Seconds uint8
+        Day uint8
+        Month uint8
+        Year uint16
+        DayOfWeek uint8
+}
+
+func (d *DateTime) Decode(data interface{}) {
+        buf := bytes.NewBuffer(data.([]byte))
+        err := binary.Read(buf, binary.BigEndian, d)
+        if err != nil {
+                panic(fmt.Errorf("binary.Write failed:", err))
+        }
+}                
 
 type ErrorPacket struct {
 	// 4 bytes header
@@ -222,6 +270,11 @@ func (p *ErrorPacket) Encode() []byte {
 	packet[6] = p.Error
 	packet = addCRC(packet)
 	return packet
+}
+
+func (p *ErrorPacket) Decode(packet []byte) {
+	p.Flags = packet[5]
+	p.Error = packet[6]
 }
 
 type InfoPacket struct {
@@ -246,6 +299,14 @@ func (p *InfoPacket) Encode() []byte {
 	return packet 
 }
 
+func (p *InfoPacket) Decode(packet []byte) {
+	p.Flags = packet[5]
+	p.Eid = uint32(uint8(packet[6])>>24 + uint8(packet[7])>>16 + uint8(packet[8])>>8 + uint8(packet[9])&0xff)
+	p.Dtype = packet[10]
+	p.Data = packet[11:len(packet)-2]
+}
+
+// remove that !!!
 func EncodeInfoPacket( flags byte, eid uint32, data interface{}) (p []byte) {
 	packet := make([]byte, 11, 141)                                                
 	addHeader(packet)
@@ -273,16 +334,20 @@ func (p *QueryPacket) Encode() []byte {
 	packet[6], packet[7], packet[8], packet[9] = uint8(p.Eid>>24), uint8(p.Eid>>16), uint8(p.Eid>>8), uint8(p.Eid&0xff)
 	packet = addCRC(packet)     
 	return packet 
+}
 
+func (p  *QueryPacket) Decode(packet []byte) {
+	p.Flags = packet[5]
+	p.Eid = uint32(uint8(packet[6])>>24 + uint8(packet[7])>>16 + uint8(packet[8])>>8 + uint8(packet[9])&0xff)
 }
 
 type WritePacket struct {
 	// 4 bytes header
 	// 1 byte packet type
 	Flags byte       // flags 
-	Eid uint32      // endpoint id
+	Eid uint32       // endpoint id
 	Dtype byte	 // data type
-	Data interface{}      // payload, size depending on datatype
+	Data interface{} // payload, size depending on datatype
 }     
 
 func (p *WritePacket) Encode() []byte {
@@ -294,6 +359,12 @@ func (p *WritePacket) Encode() []byte {
 	packet = addData(packet, p.Data)                                                
 	packet = addCRC(packet)     
 	return packet 
-
 }
 
+func (p *WritePacket) Decode(packet []byte) {
+	p.Flags = packet[5]
+	p.Eid = uint32(uint8(packet[6])>>24 + uint8(packet[7])>>16 + uint8(packet[8])>>8 + uint8(packet[9])&0xff)
+	p.Dtype = packet[10]
+	p.Data = packet[11:len(packet)-2]
+
+}

@@ -7,6 +7,12 @@ Rectangle {
 	//width: 1280 // chalk elec screen
 	//height: 800 // chalk elec screen
 
+	// Load fonts
+	FontLoader { 
+		id: mainFont; 
+		source: "fonts/Droid_Serif/DroidSerif.ttf" 
+	}
+
 	SimpleViewManager {
 		id: viewManager 
 		anchors.fill: parent
@@ -31,20 +37,42 @@ Rectangle {
 					GradientStop { position: 1.0; color: "#ff222222" }
 				}
 
+				Text {
+					id: demoMessage
+					text: "Click on the Login button to test animated transition"
+					color: "#ff999999"
+					font.family: mainFont.name
+					font.pointSize: 14
+					anchors.verticalCenter: parent.verticalCenter
+					anchors.left: parent.left
+					anchors.leftMargin: 10
+				}
+
 				Rectangle {
 					id: loginButton
+					radius: 5
 					anchors.top: parent.top
 					anchors.bottom: parent.bottom
 					anchors.right: parent.right
 					anchors.topMargin: 10
 					anchors.bottomMargin: 10
 					anchors.rightMargin: 10
-					width: 200
-					color: "red"
+					width: loginButtonText.paintedWidth + 30
+					color: "#ffffffff"
 
 					Text {
 						id: loginButtonText
 						text: "Login"
+						font.family: mainFont.name
+						font.bold: false
+						color: "#ff000000"
+						anchors.centerIn: parent
+						font.pointSize: 14
+					}
+
+					MouseArea {
+						anchors.fill: parent
+						onClicked: view2.visible = true
 					}
 				}
 			}
@@ -76,11 +104,6 @@ Rectangle {
 					GradientStop { position: 1.0; color: "#ff222222" }
 				}
 			}
-
-			MouseArea {
-				anchors.fill: parent
-				onClicked: view2.visible = true
-	    	}
 		}
 
 		Rectangle {
@@ -91,8 +114,11 @@ Rectangle {
 
 			Text {
 				id: view1Text
-				text: "Go to main view"
-				color: "white"
+				text: "Click to go back to the main view"
+				color: "black"
+				font.family: mainFont.name
+				font.pointSize: 24
+				font.bold: false
 				anchors.centerIn: parent
 	    	}
 	    		

@@ -44,7 +44,7 @@ Rectangle {
 
 					Text {
 						id: loginButtonText
-						text: 
+						text: "Login"
 					}
 				}
 			}

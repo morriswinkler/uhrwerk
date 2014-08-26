@@ -17,6 +17,7 @@ Rectangle {
 		id: viewManager 
 		anchors.fill: parent
 
+		// Main view
 		Rectangle {
 			id: view1
 			width: parent.width
@@ -106,6 +107,15 @@ Rectangle {
 			}
 		}
 
+		Rectangle {
+			id: bookingView
+			width: parent.width
+			height: parent.height
+
+			
+		}
+
+		// Temp view
 		Rectangle {
 			id: view2
 			width: parent.width

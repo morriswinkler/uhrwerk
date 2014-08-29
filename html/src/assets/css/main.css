@@ -1,7 +1,73 @@
 body {
-  background: #bada55;
+  background-color: #eee;
+  width: 100%;
+  height: 100%;
   margin: 0;
+  padding: 0;
 }
-h1 {
-  color: #ff5555;
+.form-signin,
+.form-signout,
+.form-deactivate {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+.form-signin-heading,
+.form-signout-heading,
+.form-deactivate-heading {
+  margin-top: -50px;
+}
+.form-signin .form-signin-heading,
+.form-signin {
+  margin-bottom: 10px;
+}
+.form-signin {
+  font-weight: normal;
+}
+.form-signin .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin input[type="email"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.row {
+  margin: -1px;
+}
+[class^="col"] {
+  padding: 1px;
+}
+.product {
+  height: 100%;
+  padding: 10px;
+}
+.available {
+  background-color: #bada55;
+}
+.unavailable {
+  background-color: #999999;
+}
+.used {
+  background-color: #999999;
+}
+.product h3 {
+  margin-top: 0;
+}
+.product button {
+  margin-top: 10px;
 }

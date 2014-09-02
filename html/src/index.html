@@ -12,88 +12,39 @@
 	<!-- /build -->
 </head>
 <body>
-	<section id="signin">
+	<section class="page" id="login-page">
 		<div class="container-fluid">
-			<form class="form-signin" role="form">
-        <h2 class="form-signin-heading">Sign in</h2>
-        <input type="email" class="form-control" placeholder="Email address" required autofocus>
-        <input type="password" class="form-control" placeholder="Password" required>
-        <button class="btn btn-lg btn-primary btn-block advance" type="submit">Sign in</button>
-      </form>
+			<form class="login-form" role="form">
+				<h2 class="heading">Sign in</h2>
+				<input name="username" type="email" class="form-control" placeholder="Email address" required autofocus>
+				<input name="password" type="password" class="form-control" placeholder="Password" required>
+				<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+			</form>
 		</div>
-	</section><!-- /#signin -->
-	<section id="dashboard">
+	</section><!-- /#login -->
+
+	<section class="page" id="dashboard-page">
 		<div class="container-fluid">
 			<h2>Dashboard</h2>
-			<div class="row">
-				<div class="col-sm-3">
-					<div class="product available">
-						<h3 class="product-heading">3D Printer</h3>
-						<div class="row">
-							<div class="col-xs-5"><b>Status</b></div>
-							<div class="col-xs-7">Available</div>
-						</div>
-						<div class="row">
-							<div class="col-xs-5"><b>Price</b></div>
-							<div class="col-xs-7">1 €/h</div>
-						</div>
-						<button class="btn btn-lg btn-primary btn-block advance">Activate</button>
-					</div>
-				</div><!-- /.col -->
-				<div class="col-sm-3">
-					<div class="product unavailable">
-						<h3 class="product-heading">Laser Cutter</h3>
-						<div class="row">
-							<div class="col-xs-5"><b>Status</b></div>
-							<div class="col-xs-7">Unavailable</div>
-						</div>
-						<div class="row">
-							<div class="col-xs-5">&nbsp;</div>
-							<div class="col-xs-7">&nbsp;</div>
-						</div>
-						<button class="btn btn-lg btn-primary btn-block advance" disabled="disabled">Activate</button>
-					</div>
-				</div><!-- /.col -->
-				<div class="col-sm-3">
-					<div class="product used">
-						<h3 class="product-heading">CNC Machine</h3>
-						<div class="row">
-							<div class="col-xs-5"><b>Status</b></div>
-							<div class="col-xs-7">Used</div>
-						</div>
-						<div class="row">
-							<div class="col-xs-5"><b>By</b></div>
-							<div class="col-xs-7">Judith</div>
-						</div>
-						<button class="btn btn-lg btn-primary btn-block advance" disabled="disabled">Activate</button>
-					</div>
-				</div><!-- /.col -->
-				<div class="col-sm-3">
-					<div class="product available">
-						<h3 class="product-heading">Hand Drill</h3>
-						<div class="row">
-							<div class="col-xs-5"><b>Status</b></div>
-							<div class="col-xs-7">Available</div>
-						</div>
-						<div class="row">
-							<div class="col-xs-5"><b>Price</b></div>
-							<div class="col-xs-7">1 €/h</div>
-						</div>
-						<button class="btn btn-lg btn-primary btn-block advance">Activate</button>
-					</div>
-				</div><!-- /.col -->
+			<div class="row products">
+				<!-- Product items go here -->
 			</div>
 		</div>
-	</section><!-- #dashboard -->
-	<section id="message">
+	</section>
+	<!-- /#dashboard -->
+
+	<section class="page" id="message-page">
 		<div class="container-fluid">
-			<form class="form-signout" role="form">
+			<form class="signout-form" role="form">
 				<h2 class="form-signout-heading">Thank You!</h2>
 				<p>You just activated a machine. Time is ticking so get to work. This page will log you out automatically in 9 seconds.</p>
 				<button class="btn btn-lg btn-danger btn-block advance" type="submit">Sign out</button>
 			</form>
 		</div>
-	</section><!-- /#message -->
+	</section>
+	<!-- /#message -->
+	
+	<!-- 
 	<section id="deactivate">
 		<div class="container-fluid">
 			<form class="form-deactivate" role="form">
@@ -102,12 +53,41 @@
 				<button class="btn btn-lg btn-danger btn-block advance" type="submit">Deactivate</button>
 			</form>
 		</div>
-	</section><!-- /#deactivate -->
+	</section>
+	-->
+	<!-- /#deactivate -->
+
+	<!-- riot.js templates -->
+	<template id="product-tmpl">
+		<div class="col-sm-3">
+			<div class="product {statusClass}">
+				<h3 class="product-heading">{name}</h3>
+				<div class="row">
+					<div class="col-xs-5"><b>Status</b></div>
+					<div class="col-xs-7">{status}</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-5"><b>Price</b></div>
+					<div class="col-xs-7">{price}</div>
+				</div>
+				<button class="btn btn-lg btn-primary btn-block advance"{disabled}>Activate</button>
+			</div>
+		</div>
+	</template>
+	<!-- /riot.js templates -->
 
 	<!-- build:js assets/js/app.min.js -->
 	<script src="libs/jquery/dist/jquery.js"></script>
 	<script src="libs/bootstrap/dist/js/bootstrap.js"></script>
-	<script src="assets/js/main.js"></script>
+	<script src="libs/riotjs/riot.js"></script>
+	<script src="assets/js/db/local-db.js"></script>
+	<script src="assets/js/models/app-model.js"></script>
+	<script src="assets/js/presenters/login-presenter.js"></script>
+	<script src="assets/js/presenters/dashboard-presenter.js"></script>
+	<script src="assets/js/presenters/message-presenter.js"></script>
+	<script src="assets/js/routes.js"></script>
+	<script src="assets/js/init.js"></script>
+
 	<!-- /build -->
 </body>
 </html>

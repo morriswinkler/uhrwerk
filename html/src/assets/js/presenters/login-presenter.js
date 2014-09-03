@@ -28,7 +28,6 @@ function loginPresenter(element, options) {
 
   function onLoginSuccess(userID) {
     element.find('.alerts').empty();
-    alert('User ID: ' + userID);
     element.removeClass('active');
   }
 

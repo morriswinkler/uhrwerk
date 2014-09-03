@@ -33,7 +33,13 @@ all of the parts of the application has been loaded.
 		model: app
 	});
 
-	// Start the application
+	// Bind status bar presenter to the App model
+	statusBarPresenter($('#status-bar'), {
+		model: app,
+		tmpl: $('#status-bar-tmpl')
+	});
+
+	// Start the application with a specific page: login, dashboard, message
 	app.start('login');
 
 })(jQuery);

@@ -3,18 +3,19 @@
 function dashboardPresenter(element, options) {
   element = $(element);
   var model = options.model,
-    tmpl = options.tmpl.html();
+      tmpl = options.tmpl.html();
 
   /* Listen to user events */
-  element.on('click', 'button', function(e) {
+  element.on('click', '.btn-activate', function(e) {
     e.preventDefault();
     element.removeClass('active');
     model.load('message');
-  })
+  });
 
   /* Listen to model events */
-  model.on("load:dashboard", load);
-  model.on("load:products", listProducts);
+  model.on('load:dashboard', load);
+  model.on('load:products', listProducts);
+  model.on('logout', hide);
 
   function load() {
     // Activate page
@@ -22,7 +23,7 @@ function dashboardPresenter(element, options) {
       element.addClass('active');
     }
 
-    // fill with products
+    // Fill with products
     model.loadProducts();
   }
 
@@ -38,5 +39,9 @@ function dashboardPresenter(element, options) {
       };
       element.find('.products').append(riot.render(tmpl, data));
     });
+  }
+
+  function hide() {
+    element.removeClass('active');
   }
 }

@@ -2,7 +2,8 @@
 
 function messagePresenter(element, options) {
   element = $(element);
-  var model = options.model;
+  var model = options.model,
+      timeout = null;
 
   /* Listen to user events */
   element.on('submit', 'form', function(e) {
@@ -25,6 +26,13 @@ function messagePresenter(element, options) {
   }
 
   function hide() {
+
+    // Deactivate timeout.
+    if (timeout != null) {
+      window.clearTimeout(timeout);
+      timeout = null;
+    }
+
     element.removeClass('active');
   }
 
@@ -34,7 +42,7 @@ function messagePresenter(element, options) {
       model.logout();
     } else {
       element.find('.countdown').html(timeLeft);
-      setTimeout(function() {
+      timeout = setTimeout(function() {
         countdown(--timeLeft);
       }, 1000);
     }

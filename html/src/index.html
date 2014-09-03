@@ -16,7 +16,8 @@
 		<div class="container-fluid">
 			<form class="login-form" role="form">
 				<h2 class="heading">Sign in</h2>
-				<input name="username" type="email" class="form-control" placeholder="Email address" required autofocus>
+				<div class="alerts"><!-- Login fail messages as alerts go here --></div>
+				<input name="username" type="text" class="form-control" placeholder="Username" required autofocus>
 				<input name="password" type="password" class="form-control" placeholder="Password" required>
 				<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
 			</form>
@@ -74,6 +75,12 @@
 			</div>
 		</div>
 	</template>
+
+  <template id="login-alert-tmpl">
+    <div class="alert alert-danger" role="alert">
+      <p><b>Oops!</b> {message}</p>
+    </div>
+  </template>
 	<!-- /riot.js templates -->
 
 	<!-- build:js assets/js/app.min.js -->

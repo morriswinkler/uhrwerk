@@ -39,6 +39,7 @@ body {
   margin-top: -50px;
 }
 .login-form .heading,
+.login-form .alert,
 .login-form {
   margin-bottom: 10px;
 }

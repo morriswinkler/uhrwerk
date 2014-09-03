@@ -2,7 +2,8 @@
 
 function loginPresenter(element, options) {
   element = $(element);
-  var model = options.model;
+  var model = options.model,
+      alertTmpl = options.alertTmpl.html();
 
   /* Listen to user events */
   element.on('submit', 'form', function(e) {
@@ -25,12 +26,17 @@ function loginPresenter(element, options) {
     }
   }
 
-  function onLoginSuccess() {
+  function onLoginSuccess(userID) {
+    element.find('.alerts').empty();
+    alert('User ID: ' + userID);
     element.removeClass('active');
-    model.load('dashboard');
   }
 
-  function onLoginFail(message) {
-    alert(message);
+  function onLoginFail(response) {
+    // Clear the alert placeholder from previous rubish. The response object
+    // contains a message variable that is rendered into alertTmpl accordingly.
+    element.find('.alerts').empty().append(
+      riot.render(alertTmpl, response
+    ));
   }
 }

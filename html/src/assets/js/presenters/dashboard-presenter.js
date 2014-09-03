@@ -3,7 +3,7 @@
 function dashboardPresenter(element, options) {
   element = $(element);
   var model = options.model,
-    productTemplate = options.productTemplate.html();
+    tmpl = options.tmpl.html();
 
   /* Listen to user events */
   element.on('click', 'button', function(e) {
@@ -36,7 +36,7 @@ function dashboardPresenter(element, options) {
         price: item.price,
         disabled: item.status.toLowerCase() !== 'available' ? ' disabled' : ''
       };
-      element.find('.products').append(riot.render(productTemplate, data));
+      element.find('.products').append(riot.render(tmpl, data));
     });
   }
 }

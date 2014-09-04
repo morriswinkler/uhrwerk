@@ -32,16 +32,16 @@ function App() {
           data.users[i].email === credentials.username) {
 
         userFound = true;
+        // This should be done on the server side thou
+        var md5Password = md5(credentials.password);
 
         // Check password
-        if (data.users[i].password === credentials.password) {
+        if (data.auth[i].password === md5Password) {
 
           // We should do some kind of session management here, but for now
           // it is ok just like this and that
 
-          // Trigger login:success event and pass the user ID (for now i - the
-          // iterator can be the user ID)
-          self.trigger('login:success', i);
+          self.trigger('login:success', data.users[i].user_id);
 
           // Load dashboard, not sure if this should be here
           self.load('dashboard');
@@ -67,14 +67,19 @@ function App() {
     self.trigger('logout');
   }
 
-  self.loadProducts = function(){
-    var products = [
-      {name: 'Laser Cutter', status:'available', price:'1 €/h'},
-      {name: '3D Printer', status:'available', price:'1 €/h'},
-      {name: 'CNC Mill', status:'unavailable', price:'1 €/h'},
-      {name: 'Hand Drill', status:'used', price:'1 €/h'},
-      {name: 'Maker Bot', status:'Available', price:'1 €/h'}
-    ];
+  self.loadProducts = function() {
+    var products = [];
+
+    for (var i = 0; i < data.machines.length; i++) {
+      products[i] = {
+        name: data.machines[i].machine_name,
+        status: data.machines[i].available,
+        price: data.machines[i].calc_by_time ? 
+               data.machines[i].costs_per_min : 
+               data.machines[i].costs_per_kwh
+      }
+    }
+    
     self.trigger('load:products', products);
   }
 };

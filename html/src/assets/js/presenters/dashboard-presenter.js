@@ -23,6 +23,13 @@ function dashboardPresenter(element, options) {
       element.addClass('active');
     }
 
+    // timestamp for 2100: 4105119600
+    /*
+    var d = new Date(2100, 1, 1, 0, 0, 0, 0);
+    var unixTs = Math.round(d.getTime() / 1000);
+    console.log(unixTs);
+    */
+
     // Fill with products
     model.loadProducts();
   }
@@ -32,10 +39,10 @@ function dashboardPresenter(element, options) {
     $.each(products, function(index, item) {
       var data = {
         name: item.name, 
-        status: (item.status.charAt(0).toUpperCase() + item.status.slice(1)),
-        statusClass: item.status.toLowerCase(), 
+        status: item.status ? 'available' : 'unavailable',
+        statusClass: item.status ? 'available': 'unavailable', 
         price: item.price,
-        disabled: item.status.toLowerCase() !== 'available' ? ' disabled' : ''
+        disabled: item.status ? '' : ' disabled'
       };
       element.find('.products').append(riot.render(tmpl, data));
     });

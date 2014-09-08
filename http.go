@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"strings"
 )
 
 var templates = template.Must(template.ParseFiles("html/dist/index.html"))
@@ -54,7 +55,32 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 	}
 }
 
+func HandleRootRequest(w http.ResponseWriter, r * http.Request) {
+	//fmt.Println(r.URL.Path[1:])
+	//http.ServeFile(w, r, r.URL.Path[1:])
+
+	path := r.URL.Path
+	if path == "/" {
+		http.ServeFile(w, r, "html/src/index.html")
+	} else {
+		s := []string{"html/src", path}
+		path = strings.Join(s, "")
+		http.ServeFile(w, r, path)
+	}
+}
+
+func HandleAssetsRequest(w http.ResponseWriter, r * http.Request) {
+	fmt.Println(r.URL.Path[1:])
+	http.ServeFile(w, r, r.URL.Path[1:])
+}
+
+func HandleApiRequest(w http.ResponseWriter, r * http.Request) {
+	fmt.Fprint(w, "Api")
+}
+
 func httpdStart() {
-	http.HandleFunc("/", makeHandler(viewHandler))
+	http.HandleFunc("/", HandleRootRequest)
+	//http.HandleFunc("/html", HandleAssetsRequest)
+	http.HandleFunc("/api", HandleApiRequest)
 	http.ListenAndServe(":8080", nil)
 }

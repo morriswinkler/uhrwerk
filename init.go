@@ -26,6 +26,13 @@ func Init(
 	warningHandle io.Writer,
 	errorHandle io.Writer) {
 
+	/*
+	Usage: TRACE.Println(Error Type)
+	       ERROR.Println("Couldn't prepare the card authenticator\n")
+	       WARNING.Println("Be careful!\n")
+	       INFO.Println("Something good just happened!\n")
+	*/
+
 	TRACE = log.New(traceHandle,
 		"TRACE: ",
 		log.Ldate|log.Ltime|log.Lshortfile)

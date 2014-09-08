@@ -27,8 +27,12 @@ func main() {
 	nfc_c := make(chan string)
 	go authenticate_nfc(cfg.Nfc.Basedir, nfc_c)
 
-	for true {
+	for { // A for without anything loops forever
 		fmt.Println(<-nfc_c)
-	}
+		
+		// Main entry point
 
+		// Start server here
+		// Maybe thread server
+	}
 }

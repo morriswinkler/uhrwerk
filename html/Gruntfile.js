@@ -2,108 +2,111 @@
 
 module.exports = function (grunt) {
 
-  grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
-		
-		// package options
-		jshint: {
-		  options: {
-		    jshintrc: '.jshintrc'
-		  },
-		  all: [
-		    'Gruntfile.js',
-		    'src/assets/js/*.js'
-		  ]
-		},
-		less: {
-			dev: {
-				files: {
-          'src/assets/css/main.css': ['src/assets/less/main.less']
-        },
-        options: {
-        	compress: false
-        }
-			},
-      dist: {
-        files: {
-          'dist/assets/css/main.min.css': [
-          	'src/libs/bootstrap/less/bootstrap.less',
-          	'src/assets/less/main.less'
-          ]
-        },
-        options: {
-        	compress: true,
-        	cleancss: true
-        }
-      }
-    },
-		concat: {
-		  dist: {
-		    src: [
-		      'src/libs/jquery/dist/jquery.js',
-		      'src/libs/bootstrap/dist/js/bootstrap.js',
-		      'src/assets/js/main.js'
-		    ],
-		    dest: 'tmp/app.js'
-		  },
-		  modernizr: {
-		    src: [
-		      'src/libs/modernizr/modernizr.js'
-		    ],
-		    dest: 'tmp/modernizr.js'
-		  }
-		},
-		uglify: {
-		  dist: {
-		    files: {
-		      'dist/assets/js/modernizr.min.js' : 'tmp/modernizr.js',
-		      'dist/assets/js/app.min.js' : 'tmp/app.js'
-		    }
-		  }
-		},
-		processhtml: {
-			dist: {
+	grunt.initConfig({
+	    pkg: grunt.file.readJSON('package.json'),
+			
+			// package options
+			jshint: {
 				options: {
-					process: true
+					jshintrc: '.jshintrc'
 				},
-				files: {
-					'dist/index.html': ['src/index.html']
-				}
-			}
-		},
-		copy: {
-			dist: {
-				files: [
-					{
-						expand: true, 
-						src: ['src/libs/bootstrap/dist/fonts/*'], 
-						dest: 'dist/assets/fonts/', 
-						flatten: true,
-						filter: 'isFile'
-					}
+				all: [
+					'Gruntfile.js',
+					'src/assets/js/main.js'
 				]
-			}
-		},
-		clean: {
-		  dist: [
-		    'tmp/**'
-		  ]
-		},
-		watch: {
-			js: {
-			  files: [
-			    'src/assets/js/*.js',
-			    'src/*.html',
-			    'src/assets/less/*.less'
-			  ],
-			  tasks: ['jshint', 'less:dev'],
-			  options: {
-			    livereload: true,
-			    atBegin: true
-			  }
+			},
+			less: {
+				dev: {
+					files: {
+						'src/assets/css/main.css': ['src/assets/less/main.less']
+					},
+					options: {
+						compress: false
+					}
+				},
+				dist: {
+					files: {
+						'dist/assets/css/main.min.css': [
+							'src/libs/bootstrap/less/bootstrap.less',
+							'src/assets/less/main.less'
+						]
+					},
+					options: {
+						compress: true,
+						cleancss: true
+					}
+				}
+			},
+			concat: {
+				dist: {
+					src: [
+						'src/libs/jquery/dist/jquery.js',
+						'src/libs/bootstrap/dist/js/bootstrap.js',
+						'src/assets/js/main.js'
+					],
+					dest: 'tmp/app.js'
+				},
+				modernizr: {
+					src: [
+						'src/libs/modernizr/modernizr.js'
+					],
+					dest: 'tmp/modernizr.js'
+				}
+			},
+			uglify: {
+				dist: {
+					files: {
+						'dist/assets/js/modernizr.min.js' : 'tmp/modernizr.js',
+						'dist/assets/js/app.min.js' : 'tmp/app.js'
+					}
+				}
+			},
+			processhtml: {
+				dist: {
+					options: {
+						process: true
+					},
+					files: {
+						'dist/index.html': ['src/index.html']
+					}
+				}
+			},
+			copy: {
+				dist: {
+					files: [
+						{
+							expand: true, 
+							src: ['src/libs/bootstrap/dist/fonts/*'], 
+							dest: 'dist/assets/fonts/', 
+							flatten: true,
+							filter: 'isFile'
+						}
+					]
+				}
+			},
+			clean: {
+				all: [
+					'tmp/**'
+				]
+			},
+			watch: {
+				js: {
+					files: [
+						'src/assets/js/*.js',
+						'src/assets/js/db/*.js',
+						'src/assets/js/models/*.js',
+						'src/assets/js/presenters/*.js',
+						'src/*.html',
+						'src/assets/less/*.less'
+					],
+					tasks: ['jshint', 'less:dev'],
+					options: {
+					livereload: true,
+					atBegin: true
+				}
 			},
 		}
-  });
+	});
 
 	// Load tasks
 	grunt.loadNpmTasks('grunt-contrib-clean');
@@ -118,8 +121,8 @@ module.exports = function (grunt) {
 
 
 	// Register tasks
-  grunt.registerTask('default', ['jshint', 'less', 'concat', 'uglify', 'processhtml', 'copy', 'clean']);
-  grunt.registerTask('dist', ['jshint', 'less:dist', 'concat', 'uglify', 'processhtml', 'copy', 'clean']);
-  grunt.registerTask('dev', ['watch']);
+	grunt.registerTask('default', ['jshint', 'less', 'concat', 'uglify', 'processhtml', 'copy', 'clean']);
+	grunt.registerTask('dist', ['jshint', 'less:dist', 'concat', 'uglify', 'processhtml', 'copy', 'clean']);
+	grunt.registerTask('dev', ['watch']);
 
 };

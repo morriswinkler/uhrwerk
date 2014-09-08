@@ -1,10 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 )
+
+var templates = template.Must(template.ParseFiles("html/dist/index.html"))
+var validPath = regexp.MustCompile("^/([a-zA-Z0-9]+)$")
 
 type Page struct {
 	Title string
@@ -23,6 +28,7 @@ func loadPage(title string) (*Page, error) {
 
 func viewHandler(w http.ResponseWriter, r *http.Request, title string) {
 	p, err := loadPage(title)
+	fmt.Println(title)
 	if err != nil {
 		http.Redirect(w, r, "/edit/"+title, http.StatusFound)
 		return
@@ -37,22 +43,18 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 	}
 }
 
-func httpdStart() {
-	http.HandleFunc("/view/", makeHandler(viewHandler))
-
-	if *addr {
-		l, err := net.Listen("tcp", "127.0.0.1:0")
-		if err != nil {
-			ERROR.Fatal(err)
+func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		m := validPath.FindStringSubmatch(r.URL.Path)
+		if m == nil {
+			http.NotFound(w, r)
+			return
 		}
-		err = ioutil.WriteFile("final-port.txt", []byte(l.Addr().String()), 0644)
-		if err != nil {
-			log.Fatal(err)
-		}
-		s := &http.Server{}
-		s.Serve(l)
-		return
+		fn(w, r, m[2])
 	}
+}
 
+func httpdStart() {
+	http.HandleFunc("/", makeHandler(viewHandler))
 	http.ListenAndServe(":8080", nil)
 }

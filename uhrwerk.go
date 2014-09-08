@@ -2,7 +2,6 @@ package main
 
 import (
 	"code.google.com/p/gcfg"
-	"fmt"
 	"log"
 	"os"
 )
@@ -24,11 +23,16 @@ func main() {
 
 	Init(logFile, logFile, logFile, logFile)
 
-	nfc_c := make(chan string)
-	go authenticate_nfc(cfg.Nfc.Basedir, nfc_c)
+	// nfc_c := make(chan string)
+	// go authenticate_nfc(cfg.Nfc.Basedir, nfc_c)
+
+	// for true {
+	// 	fmt.Println(<-nfc_c)
+	// }
+
+	go httpdStart()
 
 	for true {
-		fmt.Println(<-nfc_c)
+		INFO.Println("running")
 	}
-
 }

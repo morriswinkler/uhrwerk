@@ -32,17 +32,8 @@ func main() {
 
 	go httpdStart()
 
-<<<<<<< HEAD
 	for true {
 		INFO.Println("running")
-=======
-	for { // A for without anything loops forever
-		fmt.Println(<-nfc_c)
-		
-		// Main entry point
 
-		// Start server here
-		// Maybe thread server
->>>>>>> bc0948e4e5ec5914ec4103ace8d0c0a0c33b3a4c
 	}
 }

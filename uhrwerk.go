@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/gcfg"
 	"log"
 	"os"
+	"time"
 )
 
 func main() {
@@ -32,8 +33,8 @@ func main() {
 
 	go httpdStart()
 
-	for true {
+	for {
 		INFO.Println("running")
-
+		time.Sleep(time.Second)
 	}
 }

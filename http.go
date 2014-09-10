@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"log"
 )
 
 var templates = template.Must(template.ParseFiles("html/dist/index.html"))
@@ -80,7 +81,8 @@ func HandleApiRequest(w http.ResponseWriter, r * http.Request) {
 
 func httpdStart() {
 	http.HandleFunc("/", HandleRootRequest)
-	//http.HandleFunc("/html", HandleAssetsRequest)
 	http.HandleFunc("/api", HandleApiRequest)
-	http.ListenAndServe(":8080", nil)
+	host := "localhost:8080"
+	log.Printf("Starting webserver: %s", host)
+	http.ListenAndServe(host, nil)
 }

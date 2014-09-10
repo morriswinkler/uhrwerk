@@ -31,10 +31,23 @@ func main() {
 	// 	fmt.Println(<-nfc_c)
 	// }
 
-	go httpdStart()
+	DBInit("tcp(127.0.0.1:3306)", "root", "root", "test")
+	_, err = DBTest()
+	if err != nil {
+		ERROR.Printf("DBTest failed: %s", err)
+		TRACE.Println("Exiting...")
+		log.Printf("DBTest failed: %s\n", err);
+		log.Println("Exiting...");
+		os.Exit(1)
+	} else {
+		TRACE.Println("DBTest passed!");
+		log.Println("DBTest passed!")
+		httpdStart()
+	}
+	defer DBClose()
 
 	for {
 		INFO.Println("running")
-		time.Sleep(time.Second)
+		time.Sleep(time.Minute)
 	}
 }

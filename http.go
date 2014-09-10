@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"strings"
 	"log"
 )
 
@@ -12,8 +11,7 @@ func HandleRootRequest(w http.ResponseWriter, r * http.Request) {
 	if path == "/" {
 		http.ServeFile(w, r, "html/src/index.html")
 	} else {
-		s := []string{"html/src", path}
-		path = strings.Join(s, "")
+		path = fmt.Sprintf("html/src%s", path)
 		http.ServeFile(w, r, path)
 	}
 }

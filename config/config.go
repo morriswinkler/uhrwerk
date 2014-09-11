@@ -8,9 +8,14 @@ import (
 
 // Main configuration struct
 type Config struct {
+  Log struct{
+    LogFile string
+  }
+
   Nfc struct {
     Basedir string
   }
+  
   Database struct {
     Host, Port, Username, Password string
   }

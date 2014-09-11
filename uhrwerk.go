@@ -14,13 +14,16 @@ const ConfigFile string = "config.ini"
 
 // Main function
 func main() {
+	// These are the main building blocks of our Fab Lab Locksmith solution
 	var cfg *config.Config
 	var db *database.Database
 
+	// Read config file
 	cfg = new(config.Config)
 	cfg.Init(ConfigFile)
 
-	logFile, err := os.OpenFile("log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	// Define log file
+	logFile, err := os.OpenFile(cfg.Log.LogFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalln("Failed to open log file ", logFile.Name, ":", err)
 	}

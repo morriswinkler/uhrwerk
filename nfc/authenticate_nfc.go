@@ -1,4 +1,4 @@
-package main
+package nfc
 
 import (
 	"fmt"

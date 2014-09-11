@@ -28,7 +28,7 @@ func main() {
 		log.Fatalln("Failed to open log file ", logFile.Name, ":", err)
 	}
 
-	Init(logFile, logFile, logFile, logFile)
+	debug.Init(logFile, logFile, logFile, logFile)
 
 	// nfc_c := make(chan string)
 	// go authenticate_nfc(cfg.Nfc.Basedir, nfc_c)

@@ -1,4 +1,4 @@
-package main
+package http
 
 import (
 	"fmt"
@@ -6,8 +6,29 @@ import (
 	"log"
 )
 
+type Server struct {
+	Host, Port string
+}
+
+func (s *Server) Init(Host, Port string) error {
+	
+	// Save config
+	s.Host = Host
+	s.Port = Port
+	host := fmt.Sprintf("%s:%s", s.Host, s.Port)
+
+	// Configure handlers
+	http.HandleFunc("/", s.HandleRootRequest)
+	http.HandleFunc("/api", s.HandleApiRequest)
+	
+	// And eventually start the webserver
+	log.Printf("Starting webserver: %s", host)
+	err := http.ListenAndServe(host, nil)
+	return err
+}
+
 // Handle Root Request
-func HandleRootRequest(w http.ResponseWriter, r * http.Request) {
+func (s *Server) HandleRootRequest(w http.ResponseWriter, r * http.Request) {
 	path := r.URL.Path
 	if path == "/" {
 		http.ServeFile(w, r, "html/src/index.html")
@@ -17,10 +38,10 @@ func HandleRootRequest(w http.ResponseWriter, r * http.Request) {
 	}
 }
 
-func HandleApiRequest(w http.ResponseWriter, r * http.Request) {
+func (s *Server) HandleApiRequest(w http.ResponseWriter, r * http.Request) {
 	//fmt.Fprint(w, "Api")
 
-	// Check what Negroni can do
+	// Check what Negroni can do for us
 
 	// Later we will use this to accept only POST data
 	fmt.Fprintf(w, "Request method: %s\n", r.Method)
@@ -37,13 +58,6 @@ func HandleApiRequest(w http.ResponseWriter, r * http.Request) {
 			fmt.Fprintf(w, "%s: %s\n", k, v)
 		}
 	}
-
 }
 
-func httpdStart() {
-	http.HandleFunc("/", HandleRootRequest)
-	http.HandleFunc("/api", HandleApiRequest)
-	host := "localhost:8080"
-	log.Printf("Starting webserver: %s", host)
-	http.ListenAndServe(host, nil)
-}
+

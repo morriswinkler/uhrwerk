@@ -1,3 +1,3 @@
 #!/bin/sh
 
-go run uhrwerk.go http.go
+go run uhrwerk.go

@@ -8,6 +8,7 @@ import (
 	"github.com/morriswinkler/uhrwerk/config"
 	"github.com/morriswinkler/uhrwerk/database"
 	"github.com/morriswinkler/uhrwerk/debug"
+	"github.com/morriswinkler/uhrwerk/http"
 )
 
 const ConfigFile string = "config.ini"
@@ -17,6 +18,7 @@ func main() {
 	// These are the main building blocks of our Fab Lab Locksmith solution
 	var cfg *config.Config
 	var db *database.Database
+	var web *http.Server
 
 	// Read config file
 	cfg = new(config.Config)
@@ -44,6 +46,7 @@ func main() {
 	//DBInit("tcp(127.0.0.1:3306)", "root", "root", "test")
 	//_, err = DBTest()
 	db = new(database.Database)
+	web = new(http.Server)
 
 	// Extract database related values from the ini file
 	host := fmt.Sprintf("tcp(%s:%s)", 
@@ -56,14 +59,19 @@ func main() {
 	_, err = db.Test()
 	if err != nil {
 		debug.ERROR.Printf("DBTest failed: %s", err)
-		debug.INFO.Println("Exiting...")
-		log.Printf("DBTest failed: %s\n", err);
-		log.Println("Exiting...");
+		log.Printf("DBTest failed: %s\n", err)
 		os.Exit(1)
 	} else {
 		debug.INFO.Println("DBTest passed!");
 		log.Println("DBTest passed!")
-		httpdStart()
+
+		// Init web server
+		err = web.Init(cfg.Web.Host, cfg.Web.Port)
+		if err != nil {
+			debug.ERROR.Printf("Could not start webserver: ", err)
+			log.Printf("Could not start webserver: ", err)
+			os.Exit(1)
+		}
 	}
 	defer db.Close()
 

@@ -15,9 +15,13 @@ type Config struct {
   Nfc struct {
     Basedir string
   }
-  
+
   Database struct {
     Host, Port, Username, Password string
+  }
+
+  Web struct {
+    Host, Port string
   }
 }
 

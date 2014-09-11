@@ -17,7 +17,26 @@ func HandleRootRequest(w http.ResponseWriter, r * http.Request) {
 }
 
 func HandleApiRequest(w http.ResponseWriter, r * http.Request) {
-	fmt.Fprint(w, "Api")
+	//fmt.Fprint(w, "Api")
+
+
+
+	// Later we will use this to accept only POST data
+	fmt.Fprintf(w, "Request method: %s\n", r.Method)
+	
+	// We could allow only specific hosts
+	fmt.Fprintf(w, "Host: %s\n", r.Host)
+
+	// We have to do ParseForm in order to use Form as url.Values
+	r.ParseForm()
+	vals := r.Form
+	if len(vals) > 0 {
+		fmt.Fprint(w, "Variables:\n")
+		for k, v := range vals {
+			fmt.Fprintf(w, "%s: %s\n", k, v)
+		}
+	}
+
 }
 
 func httpdStart() {

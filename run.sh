@@ -1,3 +1,3 @@
 #!/bin/sh
 
-go run uhrwerk.go
+go run main.go

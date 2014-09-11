@@ -5,7 +5,8 @@ import (
 	"log"
 	"os"
 	"time"
-	//"github.com/morriswinkler/uhrwerk/udb"
+	"github.com/morriswinkler/uhrwerk/database"
+	"github.com/morriswinkler/uhrwerk/debug"
 )
 
 // Main function
@@ -13,7 +14,7 @@ func main() {
 	var err error
 	var cfg config
 	var configFile string = "uhrwerk.ini"
-	var db *Database
+	var db *database.Database
 
 	//udb.Hello()
 
@@ -42,24 +43,24 @@ func main() {
 
 	//DBInit("tcp(127.0.0.1:3306)", "root", "root", "test")
 	//_, err = DBTest()
-	db = new(Database)
+	db = new(database.Database)
 	db.Init("tcp(127.0.0.1:3306)", "root", "root", "test")
 	_, err = db.Test()
 	if err != nil {
-		ERROR.Printf("DBTest failed: %s", err)
-		TRACE.Println("Exiting...")
+		debug.ERROR.Printf("DBTest failed: %s", err)
+		debug.INFO.Println("Exiting...")
 		log.Printf("DBTest failed: %s\n", err);
 		log.Println("Exiting...");
 		os.Exit(1)
 	} else {
-		TRACE.Println("DBTest passed!");
+		debug.INFO.Println("DBTest passed!");
 		log.Println("DBTest passed!")
 		httpdStart()
 	}
 	defer db.Close()
 
 	for {
-		INFO.Println("running")
+		debug.INFO.Println("running")
 		time.Sleep(time.Minute)
 	}
 }

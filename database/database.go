@@ -1,4 +1,5 @@
-package main
+// Database layer for the Fab Lab Locksmith
+package database
 
 import (
   "database/sql"
@@ -7,20 +8,29 @@ import (
   "fmt"
   "time"
   "errors"
+  "github.com/morriswinkler/uhrwerk/debug"
 )
 
+// Name of the test table being created in func (*Database) Test
 const TestTable string = "test_table"
+
+// Struct that holds test record variables used in func (*Database) Test
 type TestRecord struct {
   id int
   name, datetime string
 }
 
+// This is the datatype we use in main code to interface with the database
 type Database struct {
   DBHandle *sql.DB
   host, user, password, dbname string
 }
 
-// Initializes database handle, stores connection data
+// Initializes database handle, stores connection data.
+//
+// The host argument string is a combination of the protocol and hostname or 
+// IP address that has to be used to connect to the database - e.g. 
+// tcp(127.0.0.1:3306). Don't forget the port number.
 func (d *Database) Init(host, user, password, dbname string) *sql.DB {
 
   // Close old DBHandle if it exists
@@ -44,14 +54,14 @@ func (d *Database) Init(host, user, password, dbname string) *sql.DB {
   db, err := sql.Open("mysql", connData)
   
   if err != nil {
-    ERROR.Printf("Could not initialize db handle: %s", err)
+    debug.ERROR.Printf("Could not initialize db handle: %s", err)
     return nil
   }
 
   // Open doesn't open a connection. Validate DSN data:
   err = db.Ping()
   if err != nil {
-    ERROR.Printf("Could not validate db connection: %s", err)
+    debug.ERROR.Printf("Could not validate db connection: %s", err)
     return nil
   }
 
@@ -59,19 +69,19 @@ func (d *Database) Init(host, user, password, dbname string) *sql.DB {
   return d.DBHandle  
 }
 
-// returns the DB handle
+// Returns the DB handle
 func (d *Database) GetHandle() *sql.DB {
   return d.DBHandle
 }
 
 // Tests if the database can connect, create table, 
-// insert records and get records
+// insert records, get records and eventually drop the test table.
 func (d *Database) Test() (bool, error){
   var err error
 
   if d.DBHandle == nil {
     err = errors.New("Missing db handle")
-    ERROR.Println("Missing db handle")
+    debug.ERROR.Println("Missing db handle")
     return false, err
   }
 
@@ -88,7 +98,7 @@ func (d *Database) Test() (bool, error){
   _, err = db.Exec(query)
   
   if err != nil {
-    ERROR.Printf("Failed to create table: %s", err)
+    debug.ERROR.Printf("Failed to create table: %s", err)
     return false, err
   }
 
@@ -106,7 +116,7 @@ func (d *Database) Test() (bool, error){
   _, err = db.Exec(query)
   
   if (err != nil) {
-    ERROR.Printf("Failed to insert test data: %s", err)
+    debug.ERROR.Printf("Failed to insert test data: %s", err)
     return false, err
   }
 
@@ -136,7 +146,7 @@ func (d *Database) Test() (bool, error){
 // Close the connection to the database
 func (d *Database) Close() {
   if d.DBHandle != nil {
-    TRACE.Println("Closing db")
+    debug.TRACE.Println("Closing db")
     d.DBHandle.Close()
   }
 }

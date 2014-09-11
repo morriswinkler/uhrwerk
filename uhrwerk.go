@@ -11,6 +11,7 @@ func main() {
 	var err error
 	var cfg config
 	var configFile string = "uhrwerk.ini"
+	var db *Database
 
 	err = gcfg.ReadFileInto(&cfg, configFile)
 	if err != nil {
@@ -31,8 +32,11 @@ func main() {
 	// 	fmt.Println(<-nfc_c)
 	// }
 
-	DBInit("tcp(127.0.0.1:3306)", "root", "root", "test")
-	_, err = DBTest()
+	//DBInit("tcp(127.0.0.1:3306)", "root", "root", "test")
+	//_, err = DBTest()
+	db = new(Database)
+	db.Init("tcp(127.0.0.1:3306)", "root", "root", "test")
+	_, err = db.Test()
 	if err != nil {
 		ERROR.Printf("DBTest failed: %s", err)
 		TRACE.Println("Exiting...")
@@ -44,7 +48,7 @@ func main() {
 		log.Println("DBTest passed!")
 		httpdStart()
 	}
-	defer DBClose()
+	defer db.Close()
 
 	for {
 		INFO.Println("running")

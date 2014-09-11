@@ -9,29 +9,37 @@ import (
   "errors"
 )
 
-// TODO create a struct that would work like a class and add all the 
-// functions in this file to the struct.
-
 const TestTable string = "test_table"
 type TestRecord struct {
   id int
   name, datetime string
 }
 
-var DBHandle *sql.DB
+type Database struct {
+  DBHandle *sql.DB
+  host, user, password, dbname string
+}
 
-func DBInit(host, user, password, dbname string) *sql.DB {
-  // Close old DBHandle
-  if DBHandle != nil {
-    DBHandle.Close()
+// Initializes database handle, stores connection data
+func (d *Database) Init(host, user, password, dbname string) *sql.DB {
+
+  // Close old DBHandle if it exists
+  if d.DBHandle != nil {
+    d.DBHandle.Close()
   }
+
+  // Store data in our Database struct
+  d.host = host
+  d.user = user
+  d.password = password
+  d.dbname = dbname
 
   // Get new database handle
   connData := fmt.Sprintf("%s:%s@%s/%s", 
-    user, 
-    password, 
-    host, 
-    dbname)
+    d.user, 
+    d.password, 
+    d.host, 
+    d.dbname)
   
   db, err := sql.Open("mysql", connData)
   
@@ -39,7 +47,6 @@ func DBInit(host, user, password, dbname string) *sql.DB {
     ERROR.Printf("Could not initialize db handle: %s", err)
     return nil
   }
-  //defer db.Close() // Not sure about this
 
   // Open doesn't open a connection. Validate DSN data:
   err = db.Ping()
@@ -48,20 +55,27 @@ func DBInit(host, user, password, dbname string) *sql.DB {
     return nil
   }
 
-  DBHandle = db
-  return DBHandle  
+  d.DBHandle = db
+  return d.DBHandle  
 }
 
-func DBTest() (bool, error) {
+// returns the DB handle
+func (d *Database) GetHandle() *sql.DB {
+  return d.DBHandle
+}
+
+// Tests if the database can connect, create table, 
+// insert records and get records
+func (d *Database) Test() (bool, error){
   var err error
 
-  if DBHandle == nil {
+  if d.DBHandle == nil {
     err = errors.New("Missing db handle")
     ERROR.Println("Missing db handle")
     return false, err
   }
 
-  db := DBHandle
+  db := d.DBHandle
 
   // Create test table
   query := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (%s, %s, %s, %s)",
@@ -119,9 +133,10 @@ func DBTest() (bool, error) {
   return true, nil
 }
 
-func DBClose() {
-  if DBHandle != nil {
+// Close the connection to the database
+func (d *Database) Close() {
+  if d.DBHandle != nil {
     TRACE.Println("Closing db")
-    DBHandle.Close()
+    d.DBHandle.Close()
   }
 }

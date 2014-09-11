@@ -7,14 +7,15 @@ import (
 )
 
 type Server struct {
-	Host, Port string
+	Host, Port, Dir string
 }
 
-func (s *Server) Init(Host, Port string) error {
+func (s *Server) Init(Host, Port, Dir string) error {
 	
 	// Save config
 	s.Host = Host
 	s.Port = Port
+	s.Dir = Dir
 	host := fmt.Sprintf("%s:%s", s.Host, s.Port)
 
 	// Configure handlers
@@ -31,9 +32,10 @@ func (s *Server) Init(Host, Port string) error {
 func (s *Server) HandleRootRequest(w http.ResponseWriter, r * http.Request) {
 	path := r.URL.Path
 	if path == "/" {
-		http.ServeFile(w, r, "res/html/src/index.html")
+		fileToServe := fmt.Sprintf("%s/index.html", s.Dir)
+		http.ServeFile(w, r, fileToServe)
 	} else {
-		path = fmt.Sprintf("res/html/src%s", path)
+		path = fmt.Sprintf("%s%s", s.Dir, path)
 		http.ServeFile(w, r, path)
 	}
 }

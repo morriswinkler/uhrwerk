@@ -20,8 +20,8 @@ type Config struct {
     Host, Port, Username, Password string
   }
 
-  Web struct {
-    Host, Port string
+  Webserver struct {
+    Host, Port, Dir string
   }
 }
 

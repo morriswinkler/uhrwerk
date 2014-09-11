@@ -66,7 +66,7 @@ func main() {
 		log.Println("DBTest passed!")
 
 		// Init web server
-		err = web.Init(cfg.Web.Host, cfg.Web.Port)
+		err = web.Init(cfg.Webserver.Host, cfg.Webserver.Port, cfg.Webserver.Dir)
 		if err != nil {
 			debug.ERROR.Printf("Could not start webserver: ", err)
 			log.Printf("Could not start webserver: ", err)

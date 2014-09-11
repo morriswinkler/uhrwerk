@@ -2,9 +2,10 @@ package main
 
 import (
 	"io"
-	"github.com/morriswinkler/uhrwerk/debug"
+  "github.com/morriswinkler/uhrwerk/debug"
 )
 
+/*
 type NfcConfig struct {
 	Basedir string
 }
@@ -12,6 +13,7 @@ type NfcConfig struct {
 type config struct {
 	Nfc NfcConfig
 }
+*/
 
 func Init(
   traceHandle io.Writer,

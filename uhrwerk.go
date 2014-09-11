@@ -1,27 +1,24 @@
 package main
 
 import (
-	"code.google.com/p/gcfg"
 	"log"
 	"os"
 	"time"
+	"fmt"
+	"github.com/morriswinkler/uhrwerk/config"
 	"github.com/morriswinkler/uhrwerk/database"
 	"github.com/morriswinkler/uhrwerk/debug"
 )
 
+const ConfigFile string = "config.ini"
+
 // Main function
 func main() {
-	var err error
-	var cfg config
-	var configFile string = "uhrwerk.ini"
+	var cfg *config.Config
 	var db *database.Database
 
-	//udb.Hello()
-
-	err = gcfg.ReadFileInto(&cfg, configFile)
-	if err != nil {
-		log.Fatalln("Failed to open config file ", configFile, ":", err)
-	}
+	cfg = new(config.Config)
+	cfg.Init(ConfigFile)
 
 	logFile, err := os.OpenFile("log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
@@ -44,7 +41,15 @@ func main() {
 	//DBInit("tcp(127.0.0.1:3306)", "root", "root", "test")
 	//_, err = DBTest()
 	db = new(database.Database)
-	db.Init("tcp(127.0.0.1:3306)", "root", "root", "test")
+
+	// Extract database related values from the ini file
+	host := fmt.Sprintf("tcp(%s:%s)", 
+		cfg.Database.Host, 
+		cfg.Database.Port)
+	username := cfg.Database.Username
+	password := cfg.Database.Password
+
+	db.Init(host, username, password, "test")
 	_, err = db.Test()
 	if err != nil {
 		debug.ERROR.Printf("DBTest failed: %s", err)

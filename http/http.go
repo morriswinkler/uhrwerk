@@ -31,9 +31,9 @@ func (s *Server) Init(Host, Port string) error {
 func (s *Server) HandleRootRequest(w http.ResponseWriter, r * http.Request) {
 	path := r.URL.Path
 	if path == "/" {
-		http.ServeFile(w, r, "html/src/index.html")
+		http.ServeFile(w, r, "res/html/src/index.html")
 	} else {
-		path = fmt.Sprintf("html/src%s", path)
+		path = fmt.Sprintf("res/html/src%s", path)
 		http.ServeFile(w, r, path)
 	}
 }

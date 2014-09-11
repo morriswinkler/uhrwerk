@@ -6,6 +6,7 @@ import (
 	"log"
 )
 
+// Handle Root Request
 func HandleRootRequest(w http.ResponseWriter, r * http.Request) {
 	path := r.URL.Path
 	if path == "/" {
@@ -19,7 +20,7 @@ func HandleRootRequest(w http.ResponseWriter, r * http.Request) {
 func HandleApiRequest(w http.ResponseWriter, r * http.Request) {
 	//fmt.Fprint(w, "Api")
 
-
+	// Check what Negroni can do
 
 	// Later we will use this to accept only POST data
 	fmt.Fprintf(w, "Request method: %s\n", r.Method)

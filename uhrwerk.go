@@ -5,13 +5,17 @@ import (
 	"log"
 	"os"
 	"time"
+	//"github.com/morriswinkler/uhrwerk/udb"
 )
 
+// Main function
 func main() {
 	var err error
 	var cfg config
 	var configFile string = "uhrwerk.ini"
 	var db *Database
+
+	//udb.Hello()
 
 	err = gcfg.ReadFileInto(&cfg, configFile)
 	if err != nil {
@@ -30,6 +34,10 @@ func main() {
 
 	// for true {
 	// 	fmt.Println(<-nfc_c)
+	// Once a NFC ID is got, we check the db which user has it
+	// Log in the user here, pass the session id to the client side
+	// And this happens only with a single registered IP of the
+	// main terminal device
 	// }
 
 	//DBInit("tcp(127.0.0.1:3306)", "root", "root", "test")

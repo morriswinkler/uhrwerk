@@ -1,3 +1,4 @@
+// Package for handling NFC related stuff
 package nfc
 
 import (
@@ -8,6 +9,7 @@ import (
 	"time"
 )
 
+// As the function name says - authenticate NFC
 func authenticate_nfc(basedir string, nfc_c chan string) {
 
 	var err error

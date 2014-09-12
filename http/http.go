@@ -1,3 +1,4 @@
+// Fab Lab Locksmith webserver that serves the UI and provides REST API
 package http
 
 import (
@@ -6,10 +7,12 @@ import (
 	"log"
 )
 
+// Main webserver structure
 type Server struct {
 	Host, Port, Dir string
 }
 
+// Initializes the server 
 func (s *Server) Init(Host, Port, Dir string) error {
 	
 	// Save config
@@ -28,7 +31,7 @@ func (s *Server) Init(Host, Port, Dir string) error {
 	return err
 }
 
-// Handle Root Request
+// Handle Root Request - show Fab Lab Locksmith main UI
 func (s *Server) HandleRootRequest(w http.ResponseWriter, r * http.Request) {
 	path := r.URL.Path
 	if path == "/" {
@@ -40,6 +43,7 @@ func (s *Server) HandleRootRequest(w http.ResponseWriter, r * http.Request) {
 	}
 }
 
+// Api call handler
 func (s *Server) HandleApiRequest(w http.ResponseWriter, r * http.Request) {
 	//fmt.Fprint(w, "Api")
 

@@ -4,34 +4,51 @@ package http
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"log"
+	"strings"
+	"github.com/morriswinkler/uhrwerk/debug"
+	"github.com/morriswinkler/uhrwerk/database"
+	"github.com/morriswinkler/uhrwerk/api"
 )
 
 // Main webserver structure
 type Server struct {
-	Host, Port, Dir string
+	Host string
+	Port string
+	Dir string
+	db *database.Database
+	Api *api.Api
 }
 
 // Initializes the server 
-func (s *Server) Init(Host, Port, Dir string) error {
+func (s *Server) Init(Host, Port, Dir string, db *database.Database) error {
 	
 	// Save config
 	s.Host = Host
 	s.Port = Port
 	s.Dir = Dir
+	s.db = db
+	
+	// Init API
+	s.Api = api.NewApi(s.db)
+
+	// This is just to notify the user via log message later
 	host := fmt.Sprintf("%s:%s", s.Host, s.Port)
 
 	// Configure handlers
 	http.HandleFunc("/", s.HandleRootRequest)
-	http.HandleFunc("/api", s.HandleApiRequest)
+	http.HandleFunc("/api/", s.HandleApiRequest)
 	
 	// And eventually start the webserver
+	debug.INFO.Printf("Starting webserver: %s", host)
 	log.Printf("Starting webserver: %s", host)
 	err := http.ListenAndServe(host, nil)
 	return err
 }
 
-// Handle Root Request - show Fab Lab Locksmith main UI
+// HandleRootRequest displays the main HTML frontend of the FabSmith
+// - the Fab Lab Locksmith
 func (s *Server) HandleRootRequest(w http.ResponseWriter, r * http.Request) {
 	path := r.URL.Path
 	if path == "/" {
@@ -43,27 +60,23 @@ func (s *Server) HandleRootRequest(w http.ResponseWriter, r * http.Request) {
 	}
 }
 
-// Api call handler
+// HandleApiRequest handles REST API cals from the outer space
 func (s *Server) HandleApiRequest(w http.ResponseWriter, r * http.Request) {
-	//fmt.Fprint(w, "Api")
-
-	// Check what Negroni can do for us
-
-	// Later we will use this to accept only POST data
-	fmt.Fprintf(w, "Request method: %s\n", r.Method)
 	
-	// We could allow only specific hosts
-	fmt.Fprintf(w, "Host: %s\n", r.Host)
-
+	// Check what Negroni can do for us... Maybe... Maybe not!
+	
+	// Trim the url to remove leading "/" and "api"
+	path := strings.TrimPrefix(r.URL.Path, "/")
+	path = strings.TrimPrefix(path, "api")
+	path = strings.TrimPrefix(path, "/")
+	
 	// We have to do ParseForm in order to use Form as url.Values
 	r.ParseForm()
-	vals := r.Form
-	if len(vals) > 0 {
-		fmt.Fprint(w, "Variables:\n")
-		for k, v := range vals {
-			fmt.Fprintf(w, "%s: %s\n", k, v)
-		}
-	}
-}
+	var vals *url.Values = &r.Form
+	method := r.Method
 
+	// Get and serve API response
+	returnString := s.Api.Call(path, method, vals)
+	fmt.Fprintln(w, returnString)
+}
 

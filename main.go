@@ -54,8 +54,9 @@ func main() {
 		cfg.Database.Port)
 	username := cfg.Database.Username
 	password := cfg.Database.Password
+	dbname := cfg.Database.DBName
 
-	db.Init(host, username, password, "test")
+	db.Init(host, username, password, dbname)
 	_, err = db.Test()
 	if err != nil {
 		debug.ERROR.Printf("DBTest failed: %s", err)

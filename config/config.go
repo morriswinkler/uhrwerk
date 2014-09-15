@@ -17,7 +17,7 @@ type Config struct {
   }
 
   Database struct {
-    Host, Port, Username, Password string
+    Host, Port, Username, Password, DBName string
   }
 
   Webserver struct {

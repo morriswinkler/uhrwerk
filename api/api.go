@@ -70,7 +70,27 @@ func NewApiCall(api *Api, path, method string, vars *url.Values) *ApiCall {
 // {"status":"error", "message":"why"} on failure
 // One has to provide username and hashed password as args.
 func (a *ApiCall) Auth(method string, vars *url.Values) string {
-  
+
+  var db *sql.DB = a.api.db.GetHandle()
+
+  if strings.ToLower(method) == "delete" {
+    
+    // Destroy session
+    _, err := db.Exec("DELETE FROM sessions WHERE session_id=?",
+      vars.Get("sessionID"))
+
+    if err != nil {
+      debug.ERROR.Printf("Failed to delete session ID %s: %s", 
+        vars.Get("sessionID"),
+        err)
+    }
+
+    debug.INFO.Printf("A session was destroyed")
+
+    // And exit here
+    return "{\"status\":\"ok\"}"
+  }
+
   // TODO: check method and allow only POST method to pass through
 
   var username, password string
@@ -88,7 +108,7 @@ func (a *ApiCall) Auth(method string, vars *url.Values) string {
   }
 
   // Get user ID from db
-  var db *sql.DB = a.api.db.GetHandle()
+  
   var user_id int
   err := db.QueryRow("SELECT user_id FROM users WHERE username=? OR email=?", 
     username, username).Scan(&user_id)

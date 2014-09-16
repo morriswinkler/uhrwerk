@@ -51,17 +51,21 @@ function App() {
     $.removeCookie('fabsmith');
 
     // And on the server side
-    /*
     $.ajax({
       url: 'http://localhost:8080/api/auth',
       type: 'DELETE',
       success: function(data) {
         var o = $.parseJSON(data);
+        if (o.status == "ok") {
+          self.trigger('logout');
+        } else {
+          alert("Some error occured");
+          self.trigger('logout');
+        }
       }
     });
-    */
 
-    self.trigger('logout');
+    
   }
 
   self.loadProducts = function() {

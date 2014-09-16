@@ -20,50 +20,47 @@ function App() {
   // credentials contains username and password fields
   self.login = function(credentials) {
 
-    // For now we add the user checking logic here, but it should be done in
-    // some way on the backend side. We need to get some kind of session ID
-    // back from the backend that would be stored in the local storage in the 
-    // browser.
-    var userFound = false;
-    for (var i = 0; i < data.users.length; i++) {
+    // send ajax authenticate call
+    var creds = {
+      username: credentials.username,
+      password: md5(credentials.password)
+    }
+    $.post('http://localhost:8080/api/auth', creds).done(function(data) {
+      var o = $.parseJSON(data);
+      console.log(o);
 
-      // It does not matter if email or username is used for login
-      if (data.users[i].username === credentials.username || 
-          data.users[i].email === credentials.username) {
-
-        userFound = true;
-        // This should be done on the server side thou
-        var md5Password = md5(credentials.password);
-
-        // Check password
-        if (data.auth[i].password === md5Password) {
-
-          // We should do some kind of session management here, but for now
-          // it is ok just like this and that
-
-          self.trigger('login:success', data.users[i].user_id);
-
-          // Load dashboard, not sure if this should be here
-          self.load('dashboard');
-        } else {
-          self.trigger('login:fail', {
-            message: "Wrong password."
-          });
-        }
-
-        // Break the for loop and look no further for users that match
-        break;
+      // Parse server response
+      if (o.status == 'ok') {
+        $.cookie('fabsmith', o.sessionID, { expires: 1, path: '/' });
+        self.trigger('login:success', o.sessionID);
+        self.load('dashboard');
+      } else if (o.status == 'error') {
+        self.trigger('login:fail', {
+          message: o.message
+        });
+      } else {
+        self.trigger('login:fail', {
+          message: 'Some error occured'
+        });
       }
-    }
-
-    if (!userFound) {
-      self.trigger('login:fail', {
-        message: "User not found."
-      });
-    }
+    });
   }
 
   self.logout = function() {
+    // Clear session cookie
+    $.removeCookie('fabsmith');
+
+    // And on the server side
+    /*
+    $.ajax({
+      url: 'http://localhost:8080/api/auth',
+      type: 'DELETE',
+      success: function(data) {
+        var o = $.parseJSON(data);
+      }
+    });
+    */
+
     self.trigger('logout');
   }
 

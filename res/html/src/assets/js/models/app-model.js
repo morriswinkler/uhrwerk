@@ -69,18 +69,36 @@ function App() {
   }
 
   self.loadProducts = function() {
-    var products = [];
 
-    for (var i = 0; i < data.machines.length; i++) {
-      products[i] = {
-        name: data.machines[i].machine_name,
-        status: data.machines[i].available,
-        price: data.machines[i].calc_by_time ? 
-               data.machines[i].costs_per_min : 
-               data.machines[i].costs_per_kwh
+    // Attempt to get stored cookie
+    var sessionID = $.cookie('fabsmith');
+    var args = {sessionID:sessionID};
+    $.ajax({
+      url: 'http://localhost:8080/api/machines',
+      type: 'GET',
+      data: args,
+      success: function(data) {
+        var o = $.parseJSON(data);
+        if (o.status == "ok") {
+          console.log(o.machines);
+          var products = [];
+          for (var i = 0; i < o.machines.length; i++) {
+            products[i] = {
+              name: o.machines[i].machine_name,
+              status: o.machines[i].available,
+              price: o.machines[i].calc_by_time ? 
+                o.machines[i].costs_per_min : 
+                o.machines[i].costs_per_kwh
+            }
+          }
+          self.trigger('load:products', products);
+        } else if (o.status == "error") {
+          console.log("Error: " + o.message);
+          //self.trigger('logout');
+        } else {
+          console.log("Some error occured");
+        }
       }
-    }
-    
-    self.trigger('load:products', products);
+    });
   }
 };

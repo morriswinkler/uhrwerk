@@ -8,14 +8,21 @@ function dashboardPresenter(element, options) {
   /* Listen to user events */
   element.on('click', '.btn-activate', function(e) {
     e.preventDefault();
-    element.removeClass('active');
-    model.load('message');
+    //element.removeClass('active');
+
+    //alert($(this).parent().parent().data("machine-id"));
+
+    model.activateMachine($(this).parent().parent().data("machine-id"));
+
+    //model.load('message');
   });
 
   /* Listen to model events */
   model.on('load:dashboard', load);
   model.on('load:products', listProducts);
   model.on('logout', hide);
+  model.on('activateMachine:success', onActivateSuccess);
+  model.on('activateMachine:fail', onActivateFail);
 
   function load() {
     // Activate page
@@ -38,6 +45,7 @@ function dashboardPresenter(element, options) {
     element.find('.products').empty();
     $.each(products, function(index, item) {
       var data = {
+        id: item.id,
         name: item.name, 
         status: item.status ? 'available' : 'unavailable',
         statusClass: item.status ? 'available': 'unavailable', 
@@ -46,6 +54,16 @@ function dashboardPresenter(element, options) {
       };
       element.find('.products').append(riot.render(tmpl, data));
     });
+  }
+
+  function onActivateSuccess() {
+    hide();
+  }
+
+  function onActivateFail(message) {
+    alert('Error: ' + message);
+    // TODO: show another kind of error message, but this should be
+    // handled in another way
   }
 
   function hide() {

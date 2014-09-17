@@ -5,6 +5,7 @@ import (
   "net/url"
   "database/sql"
   "fmt"
+  "time"
   "github.com/morriswinkler/uhrwerk/debug"
 )
 
@@ -111,4 +112,68 @@ func (a *ApiCall) GetMachines(method string, vars *url.Values) string{
   }
   response = fmt.Sprintf("%s%s", response, "\n]}")
   return response
+}
+
+// ActivateMachine activates a machine. Pass sessionID and machineID as 
+// function arguments. Available through /api/machines/activate
+// and accepts POST method variables
+func (a *ApiCall) ActivateMachine(method string, vars *url.Values) string {
+  /*
+  // Dissallow any other request method other than POST
+  if strings.ToLower(method) == "post" {
+    debug.ERROR.Printf("Request method is not POST")
+    return "{\"status\":\"error\",\"message\":\"Failed to activate\"}"
+  }
+  */
+
+  sessionID := vars.Get("sessionID")
+  machineID := vars.Get("machineID")
+  db := a.api.db.GetHandle()
+
+  // Get user ID from session
+  userID, err := a.GetUserID(sessionID)
+  if err != nil {
+    debug.ERROR.Printf("Could not get user ID: %s", err)
+    return "{\"status\":\"error\", \"message\":\"Failed to activate machine\"}"
+  }
+
+  // Check if machine with the given ID exists
+  var machineName string
+  query := "SELECT machine_name FROM machines WHERE machine_id=?"
+  err = db.QueryRow(query, machineID).Scan(&machineName)
+  if err != nil {
+    debug.ERROR.Printf("Machine with ID %d does not exist: %s", machineID, err)
+    return "{\"status\":\"error\", \"message\":\"Failed to activate machine\"}"
+  }
+  if machineName == "" {
+    debug.ERROR.Printf("Machine with ID %d does not exist", machineID)
+    return "{\"status\":\"error\", \"message\":\"Failed to activate machine\"}"
+  }
+
+  // Check if there is no active booking in the database already
+  var bookExists bool
+  query = "SELECT EXISTS (SELECT book_id FROM bookings WHERE user_id=? AND active=1)"
+  err = db.QueryRow(query, userID).Scan(&bookExists)
+  if err != nil {
+    debug.ERROR.Printf("Could not exec query: %s", err)
+    return "{\"status\":\"error\", \"message\":\"Failed to activate machine\"}"
+  }
+  if bookExists {
+    debug.ERROR.Printf("There is an active booking for user %d already", userID)
+    return "{\"status\":\"error\", \"message\":\"There is an active booking already\"}"
+  }
+
+  // Create new booking for machine and activate it
+  query = "INSERT INTO bookings VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)" // 14 vals
+  _, err = db.Exec(query,
+    nil, nil, userID, machineID, true, 
+    time.Now().Format("2006-01-02 15:04:05"),
+    nil, 0, 0, 0, 0, "", false, false)
+  if err != nil {
+    debug.ERROR.Printf("Could not add new booking: %s", err)
+    return "{\"status\":\"error\", \"message\":\"Failed to activate machine\"}"
+  }
+
+  // Success, share it with others
+  return "{\"status\":\"ok\"}"
 }

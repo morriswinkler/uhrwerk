@@ -5,6 +5,8 @@ import (
   "strings"
   "net/url"
   "github.com/morriswinkler/uhrwerk/database"
+  "github.com/morriswinkler/uhrwerk/debug"
+  "database/sql"
 )
 
 type Api struct {
@@ -31,11 +33,16 @@ func (a *Api) Call(path, method string, vars *url.Values) string {
   case "auth":
     // Authentificate user
     return apiCall.Auth(method, vars)
-    break
   case "machines":
     // Return a list of machines
+    if len(urlParts) > 1 {
+      if urlParts[1] == "activate" {
+        return apiCall.ActivateMachine(method, vars)
+      } else if (urlParts[1] != "") {
+        return "{\"status\":\"error\", \"message\":\"No matching api call found\"}"
+      }
+    }
     return apiCall.GetMachines(method, vars)
-    break
   }
 
   return "{\"status\":\"error\", \"message\":\"No matching api call found\"}"
@@ -62,4 +69,22 @@ func NewApiCall(api *Api, path, method string, vars *url.Values) *ApiCall {
 // Not implemented yet.
 func (a *ApiCall) GetUser(sid string) string{
   return "{\"status\":\"not ok\"}"
+}
+
+// Gets user ID by using existing session ID as argument
+func (a *ApiCall) GetUserID(sessionID string) (int, error) {
+  var db *sql.DB = a.api.db.GetHandle()
+
+  var userID int
+  err := db.QueryRow("SELECT user_id FROM sessions WHERE session_id=?", 
+    sessionID).Scan(&userID)
+
+  if err != nil {
+    debug.ERROR.Printf("Could not get user ID for session %s: %s", 
+      sessionID, 
+      err)
+    return 0, err
+  }
+
+  return userID, nil
 }

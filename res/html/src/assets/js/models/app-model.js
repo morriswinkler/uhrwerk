@@ -27,7 +27,6 @@ function App() {
     }
     $.post('http://localhost:8080/api/auth', creds).done(function(data) {
       var o = $.parseJSON(data);
-      console.log(o);
 
       // Parse server response
       if (o.status == 'ok') {
@@ -64,8 +63,6 @@ function App() {
         }
       }
     });
-
-    
   }
 
   self.loadProducts = function() {
@@ -80,10 +77,10 @@ function App() {
       success: function(data) {
         var o = $.parseJSON(data);
         if (o.status == "ok") {
-          console.log(o.machines);
           var products = [];
           for (var i = 0; i < o.machines.length; i++) {
             products[i] = {
+              id: o.machines[i].machine_id,
               name: o.machines[i].machine_name,
               status: o.machines[i].available,
               price: o.machines[i].calc_by_time ? 
@@ -101,4 +98,26 @@ function App() {
       }
     });
   }
+
+  self.activateMachine = function(machineID) {
+    // Attempt to get stored cookie
+    var sessionID = $.cookie('fabsmith');
+    var args = {sessionID:sessionID, machineID:machineID};
+    $.ajax({
+      url: 'http://localhost:8080/api/machines/activate',
+      type: 'POST',
+      data: args,
+      success: function(data) {
+        var o = $.parseJSON(data);
+        if (o.status == "ok") {
+          self.trigger('activateMachine:success');
+          self.load('message');
+        } else if (o.status == "error") {
+          self.trigger('activateMachine:fail', o.message);
+        } else {
+          self.trigger('activateMachine:fail', 'Some error occured');
+        }
+      }
+    });
+  };
 };

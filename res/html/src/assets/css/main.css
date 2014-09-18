@@ -122,6 +122,7 @@ section#dashboard-page .products {
 #message-page .alert {
   margin-bottom: 10px;
 }
-.countdown {
+.countdown,
+.usage-time {
   font-weight: bold;
 }

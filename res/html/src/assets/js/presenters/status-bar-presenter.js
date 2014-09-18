@@ -18,7 +18,7 @@ function statusBarPresenter(element, options) {
   /* Event handlers */
   function show() {
     element.empty();
-    var data = {title: 'Dashboard'};
+    var data = {title: 'FabSmith - the Fab Lab locksmith'};
     element.append(riot.render(tmpl, data));
   }
 

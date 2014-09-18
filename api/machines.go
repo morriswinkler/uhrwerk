@@ -220,11 +220,14 @@ func (a *ApiCall) GetActivatedMachines(method string, vars *url.Values) string {
         debug.ERROR.Printf("Could not get booking record: %s", err)
         return "{\"status\":\"error\",\"message\":\"Could not get active bookings\"}"
       }
-      bookingString := fmt.Sprintf("{\"book_id\":%d, \"machine_id\":%d, \"time_start\":\"%s\", \"machine_name\":\"%s\"},", 
+      bookingString := fmt.Sprintf("{\"book_id\":%d, \"machine_id\":%d, \"time_start\":\"%s\", \"machine_name\":\"%s\", \"time_now\":\"%s\"},", 
         book_id, 
         machine_id, 
         time_start,
-        machine_name)
+        machine_name, 
+        time.Now().Format("2006-01-02 15:04:05")) 
+        // Time now is for reference as the time on the client side can be 
+        // f**d up.
       response = fmt.Sprintf("%s%s", response, bookingString)
     }
 

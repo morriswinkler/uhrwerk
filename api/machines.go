@@ -157,6 +157,14 @@ func (a *ApiCall) ActivateMachine(method string, vars *url.Values) string {
     return "{\"status\":\"error\", \"message\":\"There is an active booking already\"}"
   }
 
+  // Mark the machine as unavailable till the booking ends
+  query = "UPDATE machines SET available=false WHERE machine_id=?"
+  _, err = db.Exec(query, machineID)
+  if err != nil {
+    debug.ERROR.Printf("Error marking machine %d as unavailable: %s", err)
+    return "{\"status\":\"error\", \"message\":\"Failed to activate machine\"}"
+  }
+
   // Create new booking for machine and activate it
   query = "INSERT INTO bookings VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)" // 14 vals
   _, err = db.Exec(query,
@@ -260,10 +268,11 @@ func (a *ApiCall) DeactivateMachine(method string, vars *url.Values) string {
     return "{\"status\":\"error\", \"message\":\"Could not get user ID\"}"
   }
 
-  // Get booking start time
-  query := "SELECT time_start FROM bookings WHERE book_id=? AND user_id=?"
+  // Get booking start time and machine_id
+  query := "SELECT time_start, machine_id FROM bookings WHERE book_id=? AND user_id=?"
   var time_start string
-  err = db.QueryRow(query, bookID, userID).Scan(&time_start)
+  var machineID int
+  err = db.QueryRow(query, bookID, userID).Scan(&time_start, &machineID)
   if err != nil {
     debug.ERROR.Printf("Could not get booking time for booking %d and user %d: %s",
        bookID, userID, err)
@@ -285,6 +294,15 @@ func (a *ApiCall) DeactivateMachine(method string, vars *url.Values) string {
     debug.ERROR.Printf("There was an error while finalizing booking with ID %d and user ID %d: %s",
       bookID, userID, err)
     return "{\"status\":\"error\", \"message\":\"Error while finalizing booking\"}"
+  }
+
+  // Mark the machine available again
+  query = "UPDATE machines SET available=true WHERE machine_id=?"
+  _, err = db.Exec(query, machineID)
+  if err != nil {
+    debug.ERROR.Printf("Error while marking machine %d as available again: %s", 
+      machineID, err)
+    return "{\"status\":\"error\", \"message\":\"Failed to mark machine as available\"}"
   }
 
   return "{\"status\":\"ok\"}"

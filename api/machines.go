@@ -151,13 +151,7 @@ func (a *ApiCall) ActivateMachine(method string, vars *url.Values) string {
   }
 
   // Check if there is no active booking in the database already
-  var bookExists bool
-  query = "SELECT EXISTS (SELECT book_id FROM bookings WHERE user_id=? AND active=1)"
-  err = db.QueryRow(query, userID).Scan(&bookExists)
-  if err != nil {
-    debug.ERROR.Printf("Could not exec query: %s", err)
-    return "{\"status\":\"error\", \"message\":\"Failed to activate machine\"}"
-  }
+  var bookExists bool = a.HasActiveBookings(userID)
   if bookExists {
     debug.ERROR.Printf("There is an active booking for user %d already", userID)
     return "{\"status\":\"error\", \"message\":\"There is an active booking already\"}"
@@ -175,5 +169,101 @@ func (a *ApiCall) ActivateMachine(method string, vars *url.Values) string {
   }
 
   // Success, share it with others
+  return "{\"status\":\"ok\"}"
+}
+
+// Checks if an user has at least one active booking
+func (a *ApiCall) HasActiveBookings(userID int) bool {
+  db := a.api.db.GetHandle()
+  var bookExists bool
+  query := "SELECT EXISTS (SELECT book_id FROM bookings WHERE user_id=? AND active=1)"
+  err := db.QueryRow(query, userID).Scan(&bookExists)
+  if err != nil {
+    debug.ERROR.Printf("Could not exec query: %s", err)
+    return false
+  }
+  return bookExists
+}
+
+func (a *ApiCall) GetActivatedMachines(method string, vars *url.Values) string {
+  sessionID := vars.Get("sessionID")
+  db := a.api.db.GetHandle()
+
+  // Get user ID from session
+  userID, err := a.GetUserID(sessionID)
+  if err != nil {
+    debug.ERROR.Printf("Could not get user ID: %s", err)
+    return "{\"status\":\"error\", \"message\":\"Could not get user ID\"}"
+  }
+
+  // Check if at least one booking exists
+  var bookExists bool = a.HasActiveBookings(userID)
+  
+  // Get list of active bookings if exist
+  if bookExists {
+    query := "SELECT b.book_id, b.machine_id, b.time_start, m.machine_name FROM bookings b, machines m WHERE b.user_id=? AND b.active=1 AND b.machine_id=m.machine_id"
+    rows, err := db.Query(query, userID)
+    if err != nil {
+      debug.ERROR.Printf("Could not select bookings for user %d: %s",
+        userID, err)
+      return "{\"status\":\"error\",\"message\":\"Failed to get bookings\"}"
+    }
+    defer rows.Close()
+
+    response := "{\"status\":\"ok\", \"bookings\":["
+    for rows.Next() {
+      var book_id int
+      var machine_id int
+      var time_start string
+      var machine_name string
+      if err = rows.Scan(&book_id, &machine_id, &time_start, &machine_name); err != nil {
+        debug.ERROR.Printf("Could not get booking record: %s", err)
+        return "{\"status\":\"error\",\"message\":\"Could not get active bookings\"}"
+      }
+      bookingString := fmt.Sprintf("{\"book_id\":%d, \"machine_id\":%d, \"time_start\":\"%s\", \"machine_name\":\"%s\"},", 
+        book_id, 
+        machine_id, 
+        time_start,
+        machine_name)
+      response = fmt.Sprintf("%s%s", response, bookingString)
+    }
+
+    if err := rows.Err(); err != nil {
+      rows.Close()
+      debug.ERROR.Printf("There was an error with rows: %s", err)
+      return "{\"status\":\"error\",\"message\":\"There was some error\"}"
+    }
+
+    // Remove last comma from response string, add tail and return
+    response = strings.TrimSuffix(response, ",")
+    response = fmt.Sprintf("%s%s", response, "]}")
+    return response
+  }
+
+  return "{\"status\":\"ok\"}"
+}
+
+// This should be called DeleteBooking or similar. 
+// Removes active booking that has been created by user.
+func (a *ApiCall) DeactivateMachine(method string, vars *url.Values) string {
+  sessionID := vars.Get("sessionID")
+  bookID := vars.Get("bookID")
+  db := a.api.db.GetHandle()
+
+  // Get user ID from session
+  userID, err := a.GetUserID(sessionID)
+  if err != nil {
+    debug.ERROR.Printf("Could not get user ID: %s", err)
+    return "{\"status\":\"error\", \"message\":\"Could not get user ID\"}"
+  }
+
+  query := "DELETE FROM bookings WHERE book_id=? AND user_id=?"
+  _, err = db.Exec(query, bookID, userID)
+  if err != nil {
+    debug.ERROR.Printf("There was an error while deleting booking %d user %d: %s",
+      bookID, userID, err)
+    return "{\"status\":\"error\", \"message\":\"Error while deleting booking\"}"
+  }
+
   return "{\"status\":\"ok\"}"
 }

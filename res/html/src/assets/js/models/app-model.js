@@ -32,7 +32,28 @@ function App() {
       if (o.status == 'ok') {
         $.cookie('fabsmith', o.sessionID, { expires: 1, path: '/' });
         self.trigger('login:success', o.sessionID);
-        self.load('dashboard');
+
+        // Check for active bookings
+        var args = {sessionID:o.sessionID};
+        $.ajax({
+          url: 'http://localhost:8080/api/machines/activated',
+          type: 'GET',
+          data: args,
+          success: function(data) {
+            var o = $.parseJSON(data);
+            if (o.status == 'ok') {
+              if (o.bookings) {
+                self.trigger('load:active-bookings', o.bookings);
+              } else {
+                self.load('dashboard');
+              }
+            } else if (o.status == "error") {
+              self.load('dashboard');
+            } else {
+              self.load('dashboard');
+            }
+          }
+        });
       } else if (o.status == 'error') {
         self.trigger('login:fail', {
           message: o.message
@@ -104,6 +125,9 @@ function App() {
     var sessionID = $.cookie('fabsmith');
     var args = {sessionID:sessionID, machineID:machineID};
     $.ajax({
+      // TODO: here we should call something like
+      // /api/bookings/create or just /api/bookings and use
+      // POST to create a new booking
       url: 'http://localhost:8080/api/machines/activate',
       type: 'POST',
       data: args,
@@ -116,6 +140,28 @@ function App() {
           self.trigger('activateMachine:fail', o.message);
         } else {
           self.trigger('activateMachine:fail', 'Some error occured');
+        }
+      }
+    });
+  };
+
+  self.deactivateMachine = function(bookID) {
+    var sessionID = $.cookie('fabsmith');
+    var args = {sessionID:sessionID, bookID:bookID};
+    $.ajax({
+      // TODO: reorganize API so that we have
+      // /api/bookings/xy - by using DELETE request we delete it
+      url: 'http://localhost:8080/api/machines/deactivate',
+      type: 'POST',
+      data: args,
+      success: function(data) {
+        var o = $.parseJSON(data);
+        if (o.status == "ok") {
+          self.trigger("deactivateMachine:success", bookID);
+        } else if (o.status == "error") {
+          self.trigger("deactivateMachine:fail", o.message);
+        } else {
+          self.trigger("deactivateMachine:fail", "Some error occured");
         }
       }
     });

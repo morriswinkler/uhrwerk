@@ -12,7 +12,20 @@
 	<!-- /build -->
 </head>
 <body>
-  <div id="status-bar"><!-- Status bar template is being rendered here --></div>
+
+  <div id="status-bar">
+  	<!-- Status bar template is being rendered here -->
+  </div>
+  <!-- /#status-bar -->
+
+  <section class="page" id="active-bookings-page">
+  	<div class="container-fluid">
+  		<div class="row bookings">
+  			<!-- Active bookings go here -->
+  		</div>
+  	</div>
+  </section>
+  <!-- /#active-bookings -->
 
 	<section class="page" id="login-page">
 		<div class="container-fluid">
@@ -24,7 +37,8 @@
 				<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
 			</form>
 		</div>
-	</section><!-- /#login -->
+	</section>
+	<!-- /#login -->
 
 	<section class="page" id="dashboard-page">
     <div class="container-fluid">
@@ -45,21 +59,21 @@
 		</div>
 	</section>
 	<!-- /#message -->
-	
-	<!-- 
-	<section id="deactivate">
-		<div class="container-fluid">
-			<form class="form-deactivate" role="form">
-				<h2 class="form-deactivate-heading">Deactivate</h2>
-				<p>Here you can deactivate your currently activated machine.</p>
-				<button class="btn btn-lg btn-danger btn-block advance" type="submit">Deactivate</button>
-			</form>
-		</div>
-	</section>
-	-->
-	<!-- /#deactivate -->
 
 	<!-- riot.js templates -->
+	<template id="active-booking-tmpl">
+		<div class="active-booking">
+			<form class="deactivate-form" role="form" id="deactivate-form-{book_id}">
+				<input type="hidden" name="book_id" class="book-id" value="{book_id}">
+				<input type="hidden" name="machine_id" class="machine-id" value="{machine_id}">
+				<h2 class="form-deactivate-heading">{machine_name}</h2>
+				<div class="form-deactivate-content">
+					<p>You are currently using the {machine_name}. Click below to deactivate it.</p>
+				</div>
+				<button class="btn btn-lg btn-danger btn-block btn-deactivate" type="submit">Deactivate</button>
+			</form>
+		</div>
+	</template>
 
   <template id="status-bar-tmpl">
     <div class="status-bar">
@@ -106,13 +120,14 @@
 	<script src="assets/js/lib/md5.js"></script>
 	<script src="assets/js/db/local-db.js"></script>
 	<script src="assets/js/models/app-model.js"></script>
+	<script src="assets/js/presenters/active-bookings-presenter.js"></script>
 	<script src="assets/js/presenters/login-presenter.js"></script>
 	<script src="assets/js/presenters/dashboard-presenter.js"></script>
 	<script src="assets/js/presenters/message-presenter.js"></script>
-  	<script src="assets/js/presenters/status-bar-presenter.js"></script>
+  <script src="assets/js/presenters/status-bar-presenter.js"></script>
 	<script src="assets/js/routes.js"></script>
 	<script src="assets/js/init.js"></script>
-
 	<!-- /build -->
+
 </body>
 </html>

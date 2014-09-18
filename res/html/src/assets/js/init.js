@@ -16,6 +16,12 @@ all of the parts of the application has been loaded.
 	// Not using before not sure how routing works
 	//routes({app: app});
 
+	// Bind Active Booking presenter to the App model
+	activeBookingsPresenter( $('#active-bookings-page'), {
+		model: app,
+		tmpl: $('#active-booking-tmpl')
+	});
+
 	// Bind Login presenter to the App model
 	loginPresenter( $("#login-page"), { 
 		model: app,

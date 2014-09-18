@@ -1,4 +1,6 @@
 // FabSmith - the Fab Lab Locksmith API layer.
+// The following link seems a better way to do this: 
+// https://github.com/astaxie/build-web-application-with-golang/blob/master/en/eBook/08.3.md
 package api
 
 import (
@@ -36,9 +38,14 @@ func (a *Api) Call(path, method string, vars *url.Values) string {
   case "machines":
     // Return a list of machines
     if len(urlParts) > 1 {
-      if urlParts[1] == "activate" {
+      switch urlParts[1] {
+      case "activate":
         return apiCall.ActivateMachine(method, vars)
-      } else if (urlParts[1] != "") {
+      case "activated":
+        return apiCall.GetActivatedMachines(method, vars)
+      case "deactivate":
+        return apiCall.DeactivateMachine(method, vars)
+      default:
         return "{\"status\":\"error\", \"message\":\"No matching api call found\"}"
       }
     }

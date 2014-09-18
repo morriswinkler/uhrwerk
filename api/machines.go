@@ -260,12 +260,31 @@ func (a *ApiCall) DeactivateMachine(method string, vars *url.Values) string {
     return "{\"status\":\"error\", \"message\":\"Could not get user ID\"}"
   }
 
-  query := "DELETE FROM bookings WHERE book_id=? AND user_id=?"
-  _, err = db.Exec(query, bookID, userID)
+  // Get booking start time
+  query := "SELECT time_start FROM bookings WHERE book_id=? AND user_id=?"
+  var time_start string
+  err = db.QueryRow(query, bookID, userID).Scan(&time_start)
   if err != nil {
-    debug.ERROR.Printf("There was an error while deleting booking %d user %d: %s",
+    debug.ERROR.Printf("Could not get booking time for booking %d and user %d: %s",
+       bookID, userID, err)
+    return "{\"status\":\"error\",\"message\":\"Failed to update booking\"}"
+  }
+
+  // Convert start time into Unix timestamp
+  const timeForm = "2006-01-02 15:04:05"
+  timeStart, _ := time.ParseInLocation(timeForm, time_start, time.Now().Location())
+  timeNow := time.Now()
+  bookDuration := timeNow.Sub(timeStart)
+
+  // Deactivate machine, update booking with current end time
+  query = "UPDATE bookings SET active=false, time_end=?, time_total=? WHERE book_id=? AND user_id=?"
+  _, err = db.Exec(query, 
+    timeNow.Format("2006-01-02 15:04:05"),
+    bookDuration.Seconds(), bookID, userID)
+  if err != nil {
+    debug.ERROR.Printf("There was an error while finalizing booking with ID %d and user ID %d: %s",
       bookID, userID, err)
-    return "{\"status\":\"error\", \"message\":\"Error while deleting booking\"}"
+    return "{\"status\":\"error\", \"message\":\"Error while finalizing booking\"}"
   }
 
   return "{\"status\":\"ok\"}"

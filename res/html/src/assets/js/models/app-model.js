@@ -25,7 +25,7 @@ function App() {
       username: credentials.username,
       password: md5(credentials.password)
     }
-    $.post('http://localhost:8080/api/auth', creds).done(function(data) {
+    $.post('/api/auth', creds).done(function(data) {
       var o = $.parseJSON(data);
 
       // Parse server response
@@ -36,7 +36,7 @@ function App() {
         // Check for active bookings
         var args = {sessionID:o.sessionID};
         $.ajax({
-          url: 'http://localhost:8080/api/machines/activated',
+          url: '/api/machines/activated',
           type: 'GET',
           data: args,
           success: function(data) {
@@ -72,7 +72,7 @@ function App() {
 
     // And on the server side
     $.ajax({
-      url: 'http://localhost:8080/api/auth',
+      url: '/api/auth',
       type: 'DELETE',
       success: function(data) {
         var o = $.parseJSON(data);
@@ -92,7 +92,7 @@ function App() {
     var sessionID = $.cookie('fabsmith');
     var args = {sessionID:sessionID};
     $.ajax({
-      url: 'http://localhost:8080/api/machines',
+      url: '/api/machines',
       type: 'GET',
       data: args,
       success: function(data) {
@@ -128,7 +128,7 @@ function App() {
       // TODO: here we should call something like
       // /api/bookings/create or just /api/bookings and use
       // POST to create a new booking
-      url: 'http://localhost:8080/api/machines/activate',
+      url: '/api/machines/activate',
       type: 'POST',
       data: args,
       success: function(data) {
@@ -151,7 +151,7 @@ function App() {
     $.ajax({
       // TODO: reorganize API so that we have
       // /api/bookings/xy - by using DELETE request we delete it
-      url: 'http://localhost:8080/api/machines/deactivate',
+      url: '/api/machines/deactivate',
       type: 'POST',
       data: args,
       success: function(data) {

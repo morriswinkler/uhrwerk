@@ -13,6 +13,11 @@ import (
 
 const ConfigFile string = "config.ini"
 
+// use init() here
+func init() {
+	// initialize stuff here
+}
+
 // Main function
 func main() {
 	// These are the main building blocks of our Fab Lab Locksmith solution
